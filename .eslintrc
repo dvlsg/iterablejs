@@ -1,0 +1,15 @@
+{
+  "env": {
+    "node": true,
+    "mocha": true
+  },
+  "parser": "babel-eslint",
+  "rules": {
+    "quotes": 0,
+    "key-spacing": 0,
+    "curly": 0,
+    "no-underscore-dangle": 0,
+    "no-multi-spaces": 0,
+    "space-unary-ops": 0
+  }
+}
