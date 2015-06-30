@@ -1,6 +1,6 @@
 {
   "name": "iterablejs",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Lazy-loading wrapper for iterable items and common functional programming operations",
   "main": "dist/iterable.js",
   "scripts": {
