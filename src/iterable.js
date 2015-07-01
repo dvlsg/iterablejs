@@ -10,7 +10,7 @@
 */
 "use strict";
 
-import util from 'zana-util';
+import util, { extend, types } from 'zana-util';
 import check from 'zana-check';
 
 let slice = Array.prototype.slice;
@@ -136,6 +136,15 @@ export default class Iterable {
         if (iter && typeof iter === 'function') // really need typeof generatorFunction..
             return iter();
         return iter;
+    }
+
+    static from(...args) {
+        if (args.length === 1)
+            return new Iterable(args[0]);
+        else if (args.length > 1)
+            return new MultiIterable(...args);
+        else
+            return Iterable.empty();
     }
 
     get [Symbol.toStringTag]() {
@@ -282,9 +291,8 @@ export default class Iterable {
     last(
         predicate : Function
     ): any {
-        if (check.is(this.data, Array)) {
-
-            if (check.is(predicate, Function)) {
+        if (check.type(this.data, types.array)) {
+            if (check.instance(predicate, Function)) {
                 for (let i = this.data.length; i >= 0; i--) {
                     let v = this.data[i];
                     if (predicate(v))
@@ -306,7 +314,7 @@ export default class Iterable {
                 previous,
                 result = null,
                 expanded = Iterable.expand(this.data);
-            if (check.is(predicate, Function)) {
+            if (check.instance(predicate, Function)) {
                 while (!(current = expanded.next()).done) {
                     if (predicate(current.value))
                         result = current.value;
@@ -330,6 +338,30 @@ export default class Iterable {
         for (let v of this)
             len++;
         return len;
+    }
+
+    max(
+        selector : Function = x => x
+    ): Number {
+        let max = null;
+        for (let v of this) {
+            let num = selector(v);
+            if (check.type(num, types.number) && (max === null || num > max))
+                max = num;
+        }
+        return max;
+    }
+
+    min(
+        selector : Function = x => x
+    ): Number {
+        let min = null;
+        for (let v of this) {
+            let num = selector(v);
+            if (check.type(num, types.number) && (min === null || num < min))
+                min = num;
+        }
+        return min;
     }
 
     orderBy(
@@ -388,7 +420,7 @@ export default class Iterable {
         let sum = 0;
         for (let v of this) {
             let num = selector(v);
-            if (check.is(num, Number))
+            if (check.instance(num, Number))
                 sum += num;
         }
         return sum;
@@ -445,6 +477,20 @@ export default class Iterable {
         };
         return this;
     }
+
+    zip(
+          iter     : any
+        , selector : Function = (x, y) => extend(x, y)
+    ): Iterable {
+        let aIter = this[Symbol.iterator]();
+        let bIter = Iterable.expand(iter)[Symbol.iterator]();
+        this.data = function*() {
+            let a, b;
+            while (!(a = aIter.next()).done && !(b = bIter.next()).done)
+                yield selector(a.value, b.value);
+        };
+        return this;
+    }
 }
 
 Iterable.wrap = Iterable.from;
@@ -457,7 +503,7 @@ export class MultiIterable extends Iterable {
     iterables: Array<Iterable>;
 
     constructor(...args) {
-        super(); // cheating.. sort of..
+        super();
         this.iterables = [];
         this.join(...args);
 
@@ -481,45 +527,13 @@ export class MultiIterable extends Iterable {
         };
     }
 
-    static from(...args) {
-        return new MultiIterable(...args);
-    }
-
     get [Symbol.toStringTag]() {
         return 'MultiIterable';
     }
 
-    /*
-        need to be able to chain .join calls
-        as a result, we need to keep a running list of iterables which have been joined,
-        but only access them whenever this.data is used (iteration over Iterable)
-
-        examples:
-
-        new Iterable([1,2,3])
-            .join([4,5,6])
-            .join([7,8,9]);
-
-        OR new Iterable([1,2,3])
-            .join([4,5,6], [7,8,9]);
-
-        OR new MultiIterable([1,2,3], [4,5,6], [7,8,9])
-
-        the desired yields are:
-            [1,4,7]
-            [1,4,8]
-            [1,4,9]
-            [1,5,7]
-            [1,5,8]
-            [1,5,9]
-            ...
-            [3,6,7]
-            [3,6,8]
-            [3,6,9]
-    */
     join(...args) {
         for (let v of args)
-            this.iterables.push(v); // keep a running list of iterables, only use them when this.data is iterated over
+            this.iterables.push(v);
         return this;
     }
 }
@@ -611,12 +625,5 @@ export class OrderedIterable extends Iterable {
     }
 }
 
-export function from(...args) {
-    if (args.length === 1)
-        return new Iterable(args[0]);
-    else if (args.length > 1)
-        return new MultiIterable(...args);
-    else
-        return Iterable.empty();
-}
-export var wrap = from;
+export var from = Iterable.from;
+export var wrap = Iterable.wrap;
