@@ -236,17 +236,15 @@ export default class Iterable {
     distinct(
         selector : Function = x => x
     ): Iterable {
-        var seen = [];
+        let seen = new Set();
         let prev = Iterable.expand(this.data); // does this need to be expanded interally?
         this.data = function*() {
             for (let v of prev) {
                 let selected = selector(v);
-                /* eslint-disable no-loop-func */
-                if (!seen.find(x => util.equals(x, selected))) { // safe?
-                    seen.push(selected);
+                if (!seen.has(selected)) {
+                    seen.add(selected);
                     yield v;
                 }
-                /* eslint-enable no-loop-func */
             }
         };
         return this;
@@ -282,6 +280,22 @@ export default class Iterable {
                 return false;
         }
         return true;
+    }
+
+    intersect(
+          iter     : any
+        , selector : Function = x => x
+    ): Iterable {
+        let expanded = Iterable.expand(this.data);
+        this.data = function*() {
+            let set = new Set(Iterable.from(iter).select(selector).toArray());
+            for (let v of expanded) {
+                let selected = selector(v);
+                if (set.delete(selected))
+                    yield v;
+            }
+        };
+        return this;
     }
 
     join(...args): MultiIterable {
@@ -497,6 +511,7 @@ Iterable.wrap = Iterable.from;
 Iterable.prototype.filter = Iterable.prototype.where;
 Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.takeWhile = Iterable.prototype.while;
+Iterable.prototype.union = Iterable.prototype.concat;
 
 export class MultiIterable extends Iterable {
 
