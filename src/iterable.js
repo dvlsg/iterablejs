@@ -338,7 +338,7 @@ export default class Iterable {
     }
 
     length(): Number {
-        // shortcut if we have array / set / map / etc
+        // shortcut if we have length defined -- do we want to give sets/maps (`size`) the same treatment?
         if (this.data.length && check.type(this.data.length, types.number))
             return this.data.length;
         let len = 0;
@@ -351,10 +351,10 @@ export default class Iterable {
     max(
         selector : Function = x => x
     ): Number {
-        let max = null;
+        let max;
         for (let v of this) {
             let num = selector(v);
-            if (check.type(num, types.number) && (max === null || num > max))
+            if (check.type(num, types.number) && (max === undefined || num > max))
                 max = num;
         }
         return max;
@@ -363,10 +363,10 @@ export default class Iterable {
     min(
         selector : Function = x => x
     ): Number {
-        let min = null;
+        let min;
         for (let v of this) {
             let num = selector(v);
-            if (check.type(num, types.number) && (min === null || num < min))
+            if (check.type(num, types.number) && (min === undefined || num < min))
                 min = num;
         }
         return min;
@@ -392,7 +392,7 @@ export default class Iterable {
     reverse(): Iterable {
         let prev = this.data;
         this.data = function*() {
-            let expanded = Iterable.expand(prev);
+            let expanded = Iterable.expand(prev)[Symbol.iterator]();
             yield* reverse(expanded, expanded.next());
         };
         return this;
@@ -412,7 +412,7 @@ export default class Iterable {
         this.data = function*() {
             let a,
                 i = 0,
-                expanded = Iterable.expand(prev);
+                expanded = Iterable.expand(prev)[Symbol.iterator]();
             while (!(a = expanded.next()).done && i < count)
                 i++;
             if (!a.done) {
@@ -507,6 +507,7 @@ export default class Iterable {
 Iterable.wrap = Iterable.from;
 Iterable.prototype.filter = Iterable.prototype.where;
 Iterable.prototype.map = Iterable.prototype.select;
+Iterable.prototype.merge = Iterable.prototype.zip;
 Iterable.prototype.takeWhile = Iterable.prototype.while;
 Iterable.prototype.union = Iterable.prototype.concat;
 
@@ -518,12 +519,11 @@ export class MultiIterable extends Iterable {
         super();
         this.iterables = [];
         this.join(...args);
-
         let self = this; // since we cant use arrow functions or bind with generators
         this.data = function*() {
             let expanded = [];
             for (let iter of self.iterables)
-                expanded.push(Array.from(Iterable.expand(iter)));
+                expanded.push(Array.from(Iterable.expand(iter))); // convert to array off the top, since we will have to iterate back and forth
             function* iterate(index, accumulate) {
                 if (accumulate.length < expanded.length) {
                     for (let v of expanded[index]) {
@@ -558,11 +558,11 @@ export class OrderedIterable extends Iterable {
 
     constructor(
           data       : any
-        , selector   : Function
+        , selector   : Function = (x)    => x
         , comparer   : Function = (x, y) => x > y ? 1 : x < y ? -1 : 0
-        , descending : boolean = false
+        , descending : boolean  = false
     ) {
-        super();
+        super(data);
         this.selector = selector;
         this.comparer = (x, y) => {
             let result = comparer(x, y);

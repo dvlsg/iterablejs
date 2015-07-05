@@ -858,7 +858,7 @@ var Iterable = (function () {
     }, {
         key: 'length',
         value: function length() {
-            // shortcut if we have array / set / map / etc
+            // shortcut if we have length defined -- do we want to give sets/maps (`size`) the same treatment?
             if (this.data.length && _zanaCheck2['default'].type(this.data.length, _zanaUtil.types.number)) return this.data.length;
             var len = 0;
             var expanded = _getIterator(Iterable.expand(this.data));
@@ -872,7 +872,7 @@ var Iterable = (function () {
                 return x;
             } : arguments[0];
 
-            var max = null;
+            var max = undefined;
             var _iteratorNormalCompletion13 = true;
             var _didIteratorError13 = false;
             var _iteratorError13 = undefined;
@@ -882,7 +882,7 @@ var Iterable = (function () {
                     var v = _step13.value;
 
                     var num = selector(v);
-                    if (_zanaCheck2['default'].type(num, _zanaUtil.types.number) && (max === null || num > max)) max = num;
+                    if (_zanaCheck2['default'].type(num, _zanaUtil.types.number) && (max === undefined || num > max)) max = num;
                 }
             } catch (err) {
                 _didIteratorError13 = true;
@@ -908,7 +908,7 @@ var Iterable = (function () {
                 return x;
             } : arguments[0];
 
-            var min = null;
+            var min = undefined;
             var _iteratorNormalCompletion14 = true;
             var _didIteratorError14 = false;
             var _iteratorError14 = undefined;
@@ -918,7 +918,7 @@ var Iterable = (function () {
                     var v = _step14.value;
 
                     var num = selector(v);
-                    if (_zanaCheck2['default'].type(num, _zanaUtil.types.number) && (min === null || num < min)) min = num;
+                    if (_zanaCheck2['default'].type(num, _zanaUtil.types.number) && (min === undefined || num < min)) min = num;
                 }
             } catch (err) {
                 _didIteratorError14 = true;
@@ -971,7 +971,7 @@ var Iterable = (function () {
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
                         case 0:
-                            expanded = Iterable.expand(prev);
+                            expanded = _getIterator(Iterable.expand(prev));
                             return context$3$0.delegateYield(_reverse(expanded, expanded.next()), 't0', 2);
 
                         case 2:
@@ -1070,7 +1070,7 @@ var Iterable = (function () {
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
                         case 0:
-                            a = undefined, i = 0, expanded = Iterable.expand(prev);
+                            a = undefined, i = 0, expanded = _getIterator(Iterable.expand(prev));
 
                             while (!(a = expanded.next()).done && i < count) i++;
 
@@ -1483,6 +1483,7 @@ exports['default'] = Iterable;
 Iterable.wrap = Iterable.from;
 Iterable.prototype.filter = Iterable.prototype.where;
 Iterable.prototype.map = Iterable.prototype.select;
+Iterable.prototype.merge = Iterable.prototype.zip;
 Iterable.prototype.takeWhile = Iterable.prototype['while'];
 Iterable.prototype.union = Iterable.prototype.concat;
 
@@ -1493,7 +1494,6 @@ var MultiIterable = (function (_Iterable) {
         _get(Object.getPrototypeOf(MultiIterable.prototype), 'constructor', this).call(this);
         this.iterables = [];
         this.join.apply(this, arguments);
-
         var self = this; // since we cant use arrow functions or bind with generators
         this.data = _regeneratorRuntime.mark(function callee$2$0() {
             var marked3$0, expanded, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, iter, iterate;
@@ -1597,8 +1597,7 @@ var MultiIterable = (function (_Iterable) {
                         for (_iterator20 = _getIterator(self.iterables); !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
                             iter = _step20.value;
 
-                            // expanded.push(Array.from(Iterable.expand(iter))); // convert to array off the top, since we will have to iterate back and forth
-                            expanded.push(Iterable.expand(iter));
+                            expanded.push(_Array$from(Iterable.expand(iter)));
                         }context$3$0.next = 14;
                         break;
 
@@ -1692,7 +1691,10 @@ var MultiIterable = (function (_Iterable) {
 exports.MultiIterable = MultiIterable;
 
 var OrderedIterable = (function (_Iterable2) {
-    function OrderedIterable(data, selector) {
+    function OrderedIterable(data) {
+        var selector = arguments[1] === undefined ? function (x) {
+            return x;
+        } : arguments[1];
         var comparer = arguments[2] === undefined ? function (x, y) {
             return x > y ? 1 : x < y ? -1 : 0;
         } : arguments[2];
@@ -1700,7 +1702,7 @@ var OrderedIterable = (function (_Iterable2) {
 
         _classCallCheck(this, OrderedIterable);
 
-        _get(Object.getPrototypeOf(OrderedIterable.prototype), 'constructor', this).call(this);
+        _get(Object.getPrototypeOf(OrderedIterable.prototype), 'constructor', this).call(this, data);
         this.selector = selector;
         this.comparer = function (x, y) {
             var result = comparer(x, y);
@@ -1838,4 +1840,4 @@ var from = Iterable.from;
 exports.from = from;
 var wrap = Iterable.wrap;
 exports.wrap = wrap;
-// do we need to convert to array anymore?
+// convert to array off the top, since we will have to iterate back and forth
