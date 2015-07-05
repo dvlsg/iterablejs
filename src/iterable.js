@@ -568,7 +568,6 @@ export class OrderedIterable extends Iterable {
             let result = comparer(x, y);
             return (descending ? -result : result);
         };
-        // this.descending = descending;
         let prev = data;
         let self = this;
         this.data = function*() {
