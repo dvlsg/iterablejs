@@ -12,7 +12,6 @@ import util, { extend, types } from 'zana-util';
 import check from 'zana-check';
 
 // const DATA = Symbol('data'); // swap this.data to use DATA instead
-// let log = ::console.log;
 
 function buildMapArray(count) {
     let mapArray = new Array(count);
@@ -28,26 +27,6 @@ function buildKeyArray(elements, selector, count) {
     return keyArray;
 }
 
-// function quicksort3(keyArray, mapArray, comparer, left, right) {
-//     let indexForLessThan    = left;
-//     let indexForGreaterThan = right;
-//     let pivotIndex          = mapArray[left];
-//     let indexForIterator    = left + 1;
-//     while (indexForIterator <= indexForGreaterThan) {
-//         let cmp = comparer(keyArray[mapArray[indexForIterator]], keyArray[pivotIndex], mapArray[indexForIterator], mapArray[pivotIndex]);
-//         if (cmp < 0)
-//             swap(mapArray, indexForLessThan++, indexForIterator++);
-//         else if (cmp > 0)
-//             swap(mapArray, indexForIterator, indexForGreaterThan--);
-//         else
-//             indexForIterator++;
-//     }
-//     if (left < indexForLessThan - 1)
-//         quicksort3(keyArray, mapArray, comparer, left, indexForLessThan - 1);
-//     if (indexForGreaterThan + 1 < right)
-//         quicksort3(keyArray, mapArray, comparer, indexForGreaterThan + 1, right);
-// }
-
 function compareKeys(comparer, keys, i1, i2) {
     let k1 = keys[i1];
     let k2 = keys[i2];
@@ -57,12 +36,17 @@ function compareKeys(comparer, keys, i1, i2) {
     return c;
 }
 
+function expand(iter: any) {
+    if (iter && typeof iter === 'function') // could be mishandled. throw an error if iter() doesn't have [Symbol.iterator] defined?
+        return iter();
+    return iter;
+}
+
 function quicksort(keys, map, comparer, left, right) {
     do {
         let i = left;
         let j = right;
         let x = map[i + ((j - i) >> 1)];
-        // let p = keys[x];
         do {
             while (i < map.length && compareKeys(comparer, keys, x, map[i]) > 0)
                 i++;
@@ -71,8 +55,7 @@ function quicksort(keys, map, comparer, left, right) {
             if (i > j)
                 break; // left index has crossed right index, stop the loop
             if (i < j)
-                [map[i], map[j]] = [map[j], map[i]]; // does this work?
-                // swap(map, i, j); // swap the indexes in the map
+                [map[i], map[j]] = [map[j], map[i]];
             i++;
             j--;
         } while (i <= j);
@@ -100,7 +83,7 @@ function* reverse(iter, a) {
 // consider detecting generatorFunctions with check.isIterable (somehow. es6 spec yet?)
 function _flatten(item) {
     return function*() {
-        let prev = Iterable.expand(item);
+        let prev = expand(item);
         if (!check.isIterable(prev))
             yield prev;
         else {
@@ -108,7 +91,7 @@ function _flatten(item) {
                 if (!check.isIterable(v) && !check.instance(v, Function))
                     yield v;
                 else
-                    yield* Iterable.expand(_flatten(v));
+                    yield* expand(_flatten(v));
             }
         }
     };
@@ -125,12 +108,6 @@ export default class Iterable {
         return new Iterable([]);
     }
 
-    static expand(iter: any) {
-        if (iter && typeof iter === 'function') // could be mishandled. throw an error if iter() doesn't have [Symbol.iterator] defined?
-            return iter();
-        return iter;
-    }
-
     static from(...args) {
         if (args.length === 1)
             return new Iterable(args[0]);
@@ -145,7 +122,7 @@ export default class Iterable {
     }
 
     [Symbol.iterator]() {
-        return Iterable.expand(this.data)[Symbol.iterator](); // covers arrays, sets, generator functions, generators..
+        return expand(this.data)[Symbol.iterator](); // covers arrays, sets, generator functions, generators..
     }
 
     aggregate(
@@ -201,7 +178,7 @@ export default class Iterable {
         }
         this.data = function*() {
             for (let iter of iters) {
-                for (let v of Iterable.expand(iter))
+                for (let v of expand(iter))
                     yield v;
             }
         };
@@ -230,7 +207,7 @@ export default class Iterable {
         let prev = this.data;
         this.data = function*() {
             let seen = new Set();
-            for (let v of Iterable.expand(prev)) {
+            for (let v of expand(prev)) {
                 let selected = selector(v);
                 if (!seen.has(selected)) {
                     seen.add(selected);
@@ -282,7 +259,7 @@ export default class Iterable {
         let prev = this.data;
         this.data = function*() {
             let set = new Set(Iterable.from(iter).select(selector).toArray());
-            for (let v of Iterable.expand(prev)) {
+            for (let v of expand(prev)) {
                 let selected = selector(v);
                 if (set.delete(selected))
                     yield v;
@@ -320,7 +297,7 @@ export default class Iterable {
             let current,
                 previous,
                 result,
-                expanded = Iterable.expand(this.data);
+                expanded = expand(this.data);
             if (check.instance(predicate, Function)) {
                 while (!(current = expanded.next()).done) {
                     if (predicate(current.value))
@@ -342,7 +319,7 @@ export default class Iterable {
         if (this.data.length && check.type(this.data.length, types.number))
             return this.data.length;
         let len = 0;
-        let expanded = Iterable.expand(this.data)[Symbol.iterator]();
+        let expanded = expand(this.data)[Symbol.iterator]();
         while (!(expanded.next()).done)
             len++;
         return len;
@@ -392,7 +369,7 @@ export default class Iterable {
     reverse(): Iterable {
         let prev = this.data;
         this.data = function*() {
-            let expanded = Iterable.expand(prev)[Symbol.iterator]();
+            let expanded = expand(prev)[Symbol.iterator]();
             yield* reverse(expanded, expanded.next());
         };
         return this;
@@ -401,7 +378,7 @@ export default class Iterable {
     select(selector: Function = (x) => x): Iterable {
         let prev = this.data;
         this.data = function*() {
-            for (let v of Iterable.expand(prev))
+            for (let v of expand(prev))
                 yield selector(v);
         };
         return this;
@@ -412,7 +389,7 @@ export default class Iterable {
         this.data = function*() {
             let a,
                 i = 0,
-                expanded = Iterable.expand(prev)[Symbol.iterator]();
+                expanded = expand(prev)[Symbol.iterator]();
             while (!(a = expanded.next()).done && i < count)
                 i++;
             if (!a.done) {
@@ -440,7 +417,7 @@ export default class Iterable {
         let prev = this.data;
         this.data = function*() {
             let i = 0;
-            for (let v of Iterable.expand(prev)) {
+            for (let v of expand(prev)) {
                 if (count <= i++)
                     break;
                 yield v;
@@ -468,7 +445,7 @@ export default class Iterable {
     where(predicate: Function = (x) => x): Iterable {
         let prev = this.data;
         this.data = function*() {
-            for (let v of Iterable.expand(prev)) {
+            for (let v of expand(prev)) {
                 if (predicate(v))
                     yield v;
             }
@@ -479,7 +456,7 @@ export default class Iterable {
     while(predicate: Function = x => x): Iterable {
         let prev = this.data;
         this.data = function*() {
-            for (var v of Iterable.expand(prev)) {
+            for (var v of expand(prev)) {
                 if (!predicate(v))
                     break;
                 yield v;
@@ -494,8 +471,8 @@ export default class Iterable {
     ): Iterable {
         let prev = this.data;
         this.data = function*() {
-            let aIter = Iterable.expand(prev)[Symbol.iterator]();
-            let bIter = Iterable.expand(iter)[Symbol.iterator]();
+            let aIter = expand(prev)[Symbol.iterator]();
+            let bIter = expand(iter)[Symbol.iterator]();
             let a, b;
             while (!(a = aIter.next()).done && !(b = bIter.next()).done)
                 yield selector(a.value, b.value);
@@ -523,7 +500,7 @@ export class MultiIterable extends Iterable {
         this.data = function*() {
             let expanded = [];
             for (let iter of self.iterables)
-                expanded.push(Array.from(Iterable.expand(iter))); // convert to array off the top, since we will have to iterate back and forth
+                expanded.push(Array.from(expand(iter))); // convert to array off the top, since we will have to iterate back and forth
             function* iterate(index, accumulate) {
                 if (accumulate.length < expanded.length) {
                     for (let v of expanded[index]) {
@@ -571,7 +548,7 @@ export class OrderedIterable extends Iterable {
         let prev = data;
         let self = this;
         this.data = function*() {
-            let expanded = Iterable.expand(prev);
+            let expanded = expand(prev);
             let elements = [...expanded];
             let unsortedElements = elements.filter(x => self.selector(x) == null);
             let unsortedCount = unsortedElements.length;

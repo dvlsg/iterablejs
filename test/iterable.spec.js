@@ -94,8 +94,6 @@ describe('Iterable', () => {
 
     });
 
-    // describe('Iterable.expand()', () => {}); // this should really be hidden, not exposed
-    
     describe('Iterable.wrap()', () => {
 
         it('should be an alias for Iterable.from()', () => {

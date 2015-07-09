@@ -48,7 +48,6 @@ var _zanaCheck = require('zana-check');
 var _zanaCheck2 = _interopRequireDefault(_zanaCheck);
 
 // const DATA = Symbol('data'); // swap this.data to use DATA instead
-// let log = ::console.log;
 
 function buildMapArray(count) {
     var mapArray = new Array(count);
@@ -64,26 +63,6 @@ function buildKeyArray(elements, selector, count) {
     }return keyArray;
 }
 
-// function quicksort3(keyArray, mapArray, comparer, left, right) {
-//     let indexForLessThan    = left;
-//     let indexForGreaterThan = right;
-//     let pivotIndex          = mapArray[left];
-//     let indexForIterator    = left + 1;
-//     while (indexForIterator <= indexForGreaterThan) {
-//         let cmp = comparer(keyArray[mapArray[indexForIterator]], keyArray[pivotIndex], mapArray[indexForIterator], mapArray[pivotIndex]);
-//         if (cmp < 0)
-//             swap(mapArray, indexForLessThan++, indexForIterator++);
-//         else if (cmp > 0)
-//             swap(mapArray, indexForIterator, indexForGreaterThan--);
-//         else
-//             indexForIterator++;
-//     }
-//     if (left < indexForLessThan - 1)
-//         quicksort3(keyArray, mapArray, comparer, left, indexForLessThan - 1);
-//     if (indexForGreaterThan + 1 < right)
-//         quicksort3(keyArray, mapArray, comparer, indexForGreaterThan + 1, right);
-// }
-
 function compareKeys(comparer, keys, i1, i2) {
     var k1 = keys[i1];
     var k2 = keys[i2];
@@ -92,23 +71,27 @@ function compareKeys(comparer, keys, i1, i2) {
     return c;
 }
 
+function expand(iter) {
+    if (iter && typeof iter === 'function') // could be mishandled. throw an error if iter() doesn't have [Symbol.iterator] defined?
+        return iter();
+    return iter;
+}
+
 function quicksort(keys, map, comparer, left, right) {
     do {
         var i = left;
         var j = right;
         var x = map[i + (j - i >> 1)];
-        // let p = keys[x];
         do {
             while (i < map.length && compareKeys(comparer, keys, x, map[i]) > 0) i++;
             while (j >= 0 && compareKeys(comparer, keys, x, map[j]) < 0) j--;
             if (i > j) break; // left index has crossed right index, stop the loop
             if (i < j) {
-                ;var _ref = [map[j], map[i]];
+                ;
+                var _ref = [map[j], map[i]];
                 map[i] = _ref[0];
                 map[j] = _ref[1];
-            } // does this work?
-            // swap(map, i, j); // swap the indexes in the map
-            i++;
+            }i++;
             j--;
         } while (i <= j);
         if (j - left <= right - i) {
@@ -152,7 +135,7 @@ function _flatten(item) {
         return _regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
             while (1) switch (context$2$0.prev = context$2$0.next) {
                 case 0:
-                    prev = Iterable.expand(item);
+                    prev = expand(item);
 
                     if (_zanaCheck2['default'].isIterable(prev)) {
                         context$2$0.next = 6;
@@ -194,7 +177,7 @@ function _flatten(item) {
                     break;
 
                 case 18:
-                    return context$2$0.delegateYield(Iterable.expand(_flatten(v)), 't0', 19);
+                    return context$2$0.delegateYield(expand(_flatten(v)), 't0', 19);
 
                 case 19:
                     _iteratorNormalCompletion = true;
@@ -253,7 +236,7 @@ var Iterable = (function () {
     _createClass(Iterable, [{
         key: _Symbol$iterator,
         value: function value() {
-            return _getIterator(Iterable.expand(this.data)); // covers arrays, sets, generator functions, generators..
+            return _getIterator(expand(this.data)); // covers arrays, sets, generator functions, generators..
         }
     }, {
         key: 'aggregate',
@@ -422,7 +405,7 @@ var Iterable = (function () {
                             _didIteratorError7 = false;
                             _iteratorError7 = undefined;
                             context$3$0.prev = 10;
-                            _iterator7 = _getIterator(Iterable.expand(iter));
+                            _iterator7 = _getIterator(expand(iter));
 
                         case 12:
                             if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
@@ -577,7 +560,7 @@ var Iterable = (function () {
                             _didIteratorError9 = false;
                             _iteratorError9 = undefined;
                             context$3$0.prev = 4;
-                            _iterator9 = _getIterator(Iterable.expand(prev));
+                            _iterator9 = _getIterator(expand(prev));
 
                         case 6:
                             if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
@@ -746,7 +729,7 @@ var Iterable = (function () {
                             _didIteratorError12 = false;
                             _iteratorError12 = undefined;
                             context$3$0.prev = 4;
-                            _iterator12 = _getIterator(Iterable.expand(prev));
+                            _iterator12 = _getIterator(expand(prev));
 
                         case 6:
                             if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
@@ -842,7 +825,7 @@ var Iterable = (function () {
                 var current = undefined,
                     previous = undefined,
                     result = undefined,
-                    expanded = Iterable.expand(this.data);
+                    expanded = expand(this.data);
                 if (_zanaCheck2['default'].instance(predicate, Function)) {
                     while (!(current = expanded.next()).done) {
                         if (predicate(current.value)) result = current.value;
@@ -861,7 +844,7 @@ var Iterable = (function () {
             // shortcut if we have length defined -- do we want to give sets/maps (`size`) the same treatment?
             if (this.data.length && _zanaCheck2['default'].type(this.data.length, _zanaUtil.types.number)) return this.data.length;
             var len = 0;
-            var expanded = _getIterator(Iterable.expand(this.data));
+            var expanded = _getIterator(expand(this.data));
             while (!expanded.next().done) len++;
             return len;
         }
@@ -971,7 +954,7 @@ var Iterable = (function () {
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
                         case 0:
-                            expanded = _getIterator(Iterable.expand(prev));
+                            expanded = _getIterator(expand(prev));
                             return context$3$0.delegateYield(_reverse(expanded, expanded.next()), 't0', 2);
 
                         case 2:
@@ -1000,7 +983,7 @@ var Iterable = (function () {
                             _didIteratorError15 = false;
                             _iteratorError15 = undefined;
                             context$3$0.prev = 3;
-                            _iterator15 = _getIterator(Iterable.expand(prev));
+                            _iterator15 = _getIterator(expand(prev));
 
                         case 5:
                             if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
@@ -1070,7 +1053,7 @@ var Iterable = (function () {
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
                         case 0:
-                            a = undefined, i = 0, expanded = _getIterator(Iterable.expand(prev));
+                            a = undefined, i = 0, expanded = _getIterator(expand(prev));
 
                             while (!(a = expanded.next()).done && i < count) i++;
 
@@ -1156,7 +1139,7 @@ var Iterable = (function () {
                             _didIteratorError17 = false;
                             _iteratorError17 = undefined;
                             context$3$0.prev = 4;
-                            _iterator17 = _getIterator(Iterable.expand(prev));
+                            _iterator17 = _getIterator(expand(prev));
 
                         case 6:
                             if (_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done) {
@@ -1258,7 +1241,7 @@ var Iterable = (function () {
                             _didIteratorError18 = false;
                             _iteratorError18 = undefined;
                             context$3$0.prev = 3;
-                            _iterator18 = _getIterator(Iterable.expand(prev));
+                            _iterator18 = _getIterator(expand(prev));
 
                         case 5:
                             if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
@@ -1341,7 +1324,7 @@ var Iterable = (function () {
                             _didIteratorError19 = false;
                             _iteratorError19 = undefined;
                             context$3$0.prev = 3;
-                            _iterator19 = _getIterator(Iterable.expand(prev));
+                            _iterator19 = _getIterator(expand(prev));
 
                         case 5:
                             if (_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done) {
@@ -1422,8 +1405,8 @@ var Iterable = (function () {
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
                         case 0:
-                            aIter = _getIterator(Iterable.expand(prev));
-                            bIter = _getIterator(Iterable.expand(iter));
+                            aIter = _getIterator(expand(prev));
+                            bIter = _getIterator(expand(iter));
                             a = undefined, b = undefined;
 
                         case 3:
@@ -1456,13 +1439,6 @@ var Iterable = (function () {
         key: 'empty',
         value: function empty() {
             return new Iterable([]);
-        }
-    }, {
-        key: 'expand',
-        value: function expand(iter) {
-            if (iter && typeof iter === 'function') // could be mishandled. throw an error if iter() doesn't have [Symbol.iterator] defined?
-                return iter();
-            return iter;
         }
     }, {
         key: 'from',
@@ -1597,7 +1573,7 @@ var MultiIterable = (function (_Iterable) {
                         for (_iterator20 = _getIterator(self.iterables); !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
                             iter = _step20.value;
 
-                            expanded.push(_Array$from(Iterable.expand(iter)));
+                            expanded.push(_Array$from(expand(iter)));
                         }context$3$0.next = 14;
                         break;
 
@@ -1708,7 +1684,6 @@ var OrderedIterable = (function (_Iterable2) {
             var result = comparer(x, y);
             return descending ? -result : result;
         };
-        // this.descending = descending;
         var prev = data;
         var self = this;
         this.data = _regeneratorRuntime.mark(function callee$2$0() {
@@ -1716,7 +1691,7 @@ var OrderedIterable = (function (_Iterable2) {
             return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                 while (1) switch (context$3$0.prev = context$3$0.next) {
                     case 0:
-                        expanded = Iterable.expand(prev);
+                        expanded = expand(prev);
                         elements = [].concat(_toConsumableArray(expanded));
                         unsortedElements = elements.filter(function (x) {
                             return self.selector(x) == null;
