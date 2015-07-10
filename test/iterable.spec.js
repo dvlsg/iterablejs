@@ -237,12 +237,6 @@ describe('Iterable', () => {
             assert.true(iter.contains({d: [1, 2, 3]}));
         });
 
-        it('should use item as a predicate when it is a function', () => {
-            let iter = from([1, 2, 3, 4, 5]);
-            assert.true(iter.contains(x => x / 2 === 2.5));
-            assert.false(iter.contains(x => x / 2 === 3));
-        });
-
     });
 
     describe('distinct()', () => {
@@ -613,6 +607,15 @@ describe('Iterable', () => {
             let iter1 = from(arr).orderBy(x => x, undefined, true);
             let iter2 = from(arr).orderByDescending(x => x);
             assert.equal(iter1.toArray(), iter2.toArray());
+        });
+
+    });
+
+    describe('reduce()', () => {
+
+        it('should be an alias for aggregate()', () => {
+            let iter = new Iterable();
+            assert.equal(iter.reduce, iter.aggregate);
         });
 
     });

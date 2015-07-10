@@ -185,30 +185,18 @@ export default class Iterable {
         return this;
     }
 
-    contains(
-          item     : any
-        , selector : Function = x => x
-    ): Boolean {
-        let comparer;
-        if (check.instance(item, Function))
-            comparer = x => item(x);
-        else
-            comparer = util.equals;
-        for (let v of this) {
-            if (comparer(selector(v), item))
-                return true;
-        }
-        return false;
+    contains(item: any): Boolean {
+        return this.any(x => util.equals(x, item));
     }
 
     distinct(
-        selector : Function = x => x
+        hasher : Function = x => x
     ): Iterable {
         let prev = this.data;
         this.data = function*() {
             let seen = new Set();
             for (let v of expand(prev)) {
-                let selected = selector(v);
+                let selected = hasher(v);
                 if (!seen.has(selected)) {
                     seen.add(selected);
                     yield v;
@@ -485,6 +473,7 @@ Iterable.wrap = Iterable.from;
 Iterable.prototype.filter = Iterable.prototype.where;
 Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.merge = Iterable.prototype.zip;
+Iterable.prototype.reduce = Iterable.prototype.aggregate;
 Iterable.prototype.takeWhile = Iterable.prototype.while;
 Iterable.prototype.union = Iterable.prototype.concat;
 
@@ -575,7 +564,6 @@ export class OrderedIterable extends Iterable {
         , newComparer : Function = (x, y) => (x > y ? 1 : x < y ? -1 : 0)
         , descending  : Boolean  = false
     ): OrderedIterable {
-
         // wrap the old selector in a new selector function
         // which will build all keys into a primary/secondary structure,
         // allowing the primary key selector to grow recursively
