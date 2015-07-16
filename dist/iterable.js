@@ -382,7 +382,7 @@ var Iterable = (function () {
                 }
             }
 
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, iter, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, v;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
@@ -500,8 +500,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this, [[3, 38, 42, 50], [10, 21, 25, 33], [26,, 28, 32], [43,, 45, 49]]);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'contains',
@@ -518,7 +517,7 @@ var Iterable = (function () {
             } : arguments[0];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var seen, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, v, selected;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
@@ -593,8 +592,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this, [[4, 18, 22, 30], [23,, 25, 29]]);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'empty',
@@ -687,7 +685,7 @@ var Iterable = (function () {
             } : arguments[1];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var set, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, v, selected;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
@@ -761,8 +759,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this, [[4, 17, 21, 29], [22,, 24, 28]]);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'join',
@@ -918,7 +915,7 @@ var Iterable = (function () {
         key: 'reverse',
         value: function reverse() {
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var expanded;
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
@@ -931,8 +928,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'select',
@@ -942,7 +938,7 @@ var Iterable = (function () {
             } : arguments[0];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, v;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
@@ -1008,8 +1004,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this, [[3, 14, 18, 26], [19,, 21, 25]]);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'skip',
@@ -1017,7 +1012,7 @@ var Iterable = (function () {
             var count = arguments[0] === undefined ? 1 : arguments[0];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var a, i, expanded;
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
@@ -1052,8 +1047,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'sum',
@@ -1097,7 +1091,7 @@ var Iterable = (function () {
             var count = arguments[0] === undefined ? 1 : arguments[0];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var i, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, v;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
@@ -1173,8 +1167,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this, [[4, 17, 21, 29], [22,, 24, 28]]);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'toArray',
@@ -1200,7 +1193,7 @@ var Iterable = (function () {
             } : arguments[0];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var _iteratorNormalCompletion17, _didIteratorError17, _iteratorError17, _iterator17, _step17, v;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
@@ -1272,8 +1265,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this, [[3, 15, 19, 27], [20,, 22, 26]]);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'while',
@@ -1283,7 +1275,7 @@ var Iterable = (function () {
             } : arguments[0];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, v;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
@@ -1358,8 +1350,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this, [[3, 16, 20, 28], [21,, 23, 27]]);
-            });
-            return this;
+            }));
         }
     }, {
         key: 'zip',
@@ -1369,7 +1360,7 @@ var Iterable = (function () {
             } : arguments[1];
 
             var prev = this.data;
-            this.data = _regeneratorRuntime.mark(function callee$2$0() {
+            return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
                 var aIter, bIter, a, b;
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
@@ -1396,8 +1387,7 @@ var Iterable = (function () {
                             return context$3$0.stop();
                     }
                 }, callee$2$0, this);
-            });
-            return this;
+            }));
         }
     }, {
         key: _Symbol$toStringTag,

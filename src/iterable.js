@@ -176,13 +176,12 @@ export default class Iterable {
             else
                 iters.push(arg);
         }
-        this.data = function*() {
+        return new Iterable(function*() {
             for (let iter of iters) {
                 for (let v of expand(iter))
                     yield v;
             }
-        };
-        return this;
+        });
     }
 
     contains(item: any): Boolean {
@@ -193,7 +192,7 @@ export default class Iterable {
         hasher : Function = x => x
     ): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             let seen = new Set();
             for (let v of expand(prev)) {
                 let selected = hasher(v);
@@ -202,8 +201,7 @@ export default class Iterable {
                     yield v;
                 }
             }
-        };
-        return this;
+        });
     }
 
     empty(): Boolean {
@@ -245,15 +243,14 @@ export default class Iterable {
         , hasher : Function = x => x
     ): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             let set = new Set(Iterable.from(iter).select(hasher).toArray());
             for (let v of expand(prev)) {
                 let selected = hasher(v);
                 if (set.delete(selected))
                     yield v;
             }
-        };
-        return this;
+        });
     }
 
     join(...args): MultiIterable {
@@ -356,25 +353,23 @@ export default class Iterable {
 
     reverse(): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             let expanded = expand(prev)[Symbol.iterator]();
             yield* reverse(expanded, expanded.next());
-        };
-        return this;
+        });
     }
 
     select(selector: Function = (x) => x): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             for (let v of expand(prev))
                 yield selector(v);
-        };
-        return this;
+        });
     }
 
     skip(count: Number = 1): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             let a,
                 i = 0,
                 expanded = expand(prev)[Symbol.iterator]();
@@ -385,8 +380,7 @@ export default class Iterable {
                 while(!(a = expanded.next()).done)
                     yield a.value;
             }
-        };
-        return this;
+        });
     }
 
     sum(
@@ -403,15 +397,14 @@ export default class Iterable {
 
     take(count: Number = 1): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             let i = 0;
             for (let v of expand(prev)) {
                 if (count <= i++)
                     break;
                 yield v;
             }
-        };
-        return this;
+        });
     }
 
     toArray(): Array<any> {
@@ -432,25 +425,23 @@ export default class Iterable {
 
     where(predicate: Function = (x) => x): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             for (let v of expand(prev)) {
                 if (predicate(v))
                     yield v;
             }
-        };
-        return this;
+        });
     }
 
     while(predicate: Function = x => x): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             for (var v of expand(prev)) {
                 if (!predicate(v))
                     break;
                 yield v;
             }
-        };
-        return this;
+        });
     }
 
     zip(
@@ -458,14 +449,13 @@ export default class Iterable {
         , selector : Function = (x, y) => extend(x, y)
     ): Iterable {
         let prev = this.data;
-        this.data = function*() {
+        return new Iterable(function*() {
             let aIter = expand(prev)[Symbol.iterator]();
             let bIter = expand(iter)[Symbol.iterator]();
             let a, b;
             while (!(a = aIter.next()).done && !(b = bIter.next()).done)
                 yield selector(a.value, b.value);
-        };
-        return this;
+        });
     }
 }
 
