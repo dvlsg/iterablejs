@@ -197,14 +197,13 @@ describe('Iterable', () => {
     describe('concat()', () => {
 
         it('should yield concatenated iterables', () => {
-            let iter = from([1, 2, 3]);
-            iter.concat([4, 5, 6]);
+            let iter = from([1, 2, 3]).concat([4, 5, 6]);
             assert.equal(iter.toArray(), [1, 2, 3, 4, 5, 6]);
         });
 
         it('should be able to concatenate an iterable with itself', () => {
             let iter = from([1, 2, 3]);
-            iter.concat(iter);
+            iter = iter.concat(iter);
             assert.equal(iter.toArray(), [1, 2, 3, 1, 2, 3]);
         });
 
@@ -255,8 +254,7 @@ describe('Iterable', () => {
                 {a: 3, b: 2, c: 2},
                 {a: 4, b: 2, c: 3},
                 {a: 5, b: 2, c: 2}
-            ]);
-            iter.distinct(x => `${x.b}${x.c}`);
+            ]).distinct(x => `bob${x.b}${x.c}`);
             assert.equal(iter.toArray(), [
                 {a: 1, b: 2, c: 2},
                 {a: 2, b: 1, c: 3},
