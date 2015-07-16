@@ -972,7 +972,7 @@ describe('MultiIterable', () => {
         it('should dynamically join iterables', () => {
             let iter = new MultiIterable([1, 2], [3, 4]);
             assert.equal(iter.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
-            iter.join([5, 6]);
+            iter = iter.join([5, 6]);
             assert.equal(iter.toArray(), [
                 [1, 3, 5],
                 [1, 3, 6],
@@ -1088,12 +1088,13 @@ describe('OrderedIterable', () => {
             ];
             let iter = from(arr1)
                 .orderBy(x => x.num)
-                .thenBy(x => x.num2, undefined, true);
+                .thenBy(x => x.num2, undefined, true)
+                .thenBy(x => x.num3, undefined, false);
             assert.equal(iter.toArray(), [
                 { id: 1, num: 11, num2: 44, num3: 88 },
                 { id: 4, num: 11, num2: 33, num3: 99 },
-                { id: 2, num: 22, num2: 44, num3: 66 },
                 { id: 5, num: 22, num2: 44, num3: 55 },
+                { id: 2, num: 22, num2: 44, num3: 66 },
                 { id: 3, num: 22, num2: 33, num3: 77 }
             ]);
         });
