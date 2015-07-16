@@ -473,8 +473,7 @@ export class MultiIterable extends Iterable {
 
     constructor(...args) {
         super();
-        this.iterables = [];
-        this.join(...args);
+        this.iterables = [...args];
         let self = this; // since we cant use arrow functions or bind with generators
         this.data = function*() {
             let expanded = [];
@@ -500,9 +499,7 @@ export class MultiIterable extends Iterable {
     }
 
     join(...args) {
-        for (let v of args)
-            this.iterables.push(v);
-        return this;
+        return new MultiIterable(...this.iterables, ...args);
     }
 }
 
@@ -559,7 +556,7 @@ export class OrderedIterable extends Iterable {
         // allowing the primary key selector to grow recursively
         // by appending new selectors on to the original selectors
         let oldSelector = this.selector; // store pointer to avoid accidental recursion
-        this.selector = function(item) {
+        let compositeSelector = item => {
             return {
                 primary   : oldSelector(item),
                 secondary : newSelector(item)
@@ -571,7 +568,7 @@ export class OrderedIterable extends Iterable {
         // in order until a non-zero is found,
         // or until we reach the last comparer
         let oldComparer = this.comparer; // store pointer to avoid accidental recursion
-        this.comparer = function(compoundKeyA, compoundKeyB) {
+        let compositeComparer = (compoundKeyA, compoundKeyB) => {
             let result = oldComparer(compoundKeyA.primary, compoundKeyB.primary);
             if (result === 0) { // ensure stability
                 let newResult = newComparer(compoundKeyA.secondary, compoundKeyB.secondary);
@@ -579,7 +576,13 @@ export class OrderedIterable extends Iterable {
             }
             return result;
         };
-        return this;
+
+        return new OrderedIterable(
+              this.data
+            , compositeSelector
+            , compositeComparer
+            , false // compositeComparer already contains the flip, don't use it twice
+        );
     }
 
     thenByDescending(

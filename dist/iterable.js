@@ -1428,8 +1428,12 @@ var MultiIterable = (function (_Iterable) {
         _classCallCheck(this, MultiIterable);
 
         _get(Object.getPrototypeOf(MultiIterable.prototype), 'constructor', this).call(this);
-        this.iterables = [];
-        this.join.apply(this, arguments);
+
+        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
+        }
+
+        this.iterables = [].concat(args);
         var self = this; // since we cant use arrow functions or bind with generators
         this.data = _regeneratorRuntime.mark(function callee$2$0() {
             var marked3$0, expanded, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, iter, iterate;
@@ -1583,36 +1587,11 @@ var MultiIterable = (function (_Iterable) {
     _createClass(MultiIterable, [{
         key: 'join',
         value: function join() {
-            var _iteratorNormalCompletion21 = true;
-            var _didIteratorError21 = false;
-            var _iteratorError21 = undefined;
-
-            try {
-                for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-                    args[_key4] = arguments[_key4];
-                }
-
-                for (var _iterator21 = _getIterator(args), _step21; !(_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done); _iteratorNormalCompletion21 = true) {
-                    var v = _step21.value;
-
-                    this.iterables.push(v);
-                }
-            } catch (err) {
-                _didIteratorError21 = true;
-                _iteratorError21 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion21 && _iterator21['return']) {
-                        _iterator21['return']();
-                    }
-                } finally {
-                    if (_didIteratorError21) {
-                        throw _iteratorError21;
-                    }
-                }
+            for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+                args[_key5] = arguments[_key5];
             }
 
-            return this;
+            return new (_bind.apply(MultiIterable, [null].concat(_toConsumableArray(this.iterables), args)))();
         }
     }, {
         key: _Symbol$toStringTag,
@@ -1725,7 +1704,7 @@ var OrderedIterable = (function (_Iterable2) {
             // allowing the primary key selector to grow recursively
             // by appending new selectors on to the original selectors
             var oldSelector = this.selector; // store pointer to avoid accidental recursion
-            this.selector = function (item) {
+            var compositeSelector = function compositeSelector(item) {
                 return {
                     primary: oldSelector(item),
                     secondary: newSelector(item)
@@ -1737,7 +1716,7 @@ var OrderedIterable = (function (_Iterable2) {
             // in order until a non-zero is found,
             // or until we reach the last comparer
             var oldComparer = this.comparer; // store pointer to avoid accidental recursion
-            this.comparer = function (compoundKeyA, compoundKeyB) {
+            var compositeComparer = function compositeComparer(compoundKeyA, compoundKeyB) {
                 var result = oldComparer(compoundKeyA.primary, compoundKeyB.primary);
                 if (result === 0) {
                     // ensure stability
@@ -1746,7 +1725,9 @@ var OrderedIterable = (function (_Iterable2) {
                 }
                 return result;
             };
-            return this;
+
+            return new OrderedIterable(this.data, compositeSelector, compositeComparer, false // compositeComparer already contains the flip, don't use it twice
+            );
         }
     }, {
         key: 'thenByDescending',
