@@ -682,7 +682,7 @@ var Iterable = (function () {
     }, {
         key: 'intersect',
         value: function intersect(iter) {
-            var selector = arguments[1] === undefined ? function (x) {
+            var hasher = arguments[1] === undefined ? function (x) {
                 return x;
             } : arguments[1];
 
@@ -693,7 +693,7 @@ var Iterable = (function () {
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
                         case 0:
-                            set = new _Set(Iterable.from(iter).select(selector).toArray());
+                            set = new _Set(Iterable.from(iter).select(hasher).toArray());
                             _iteratorNormalCompletion11 = true;
                             _didIteratorError11 = false;
                             _iteratorError11 = undefined;
@@ -707,7 +707,7 @@ var Iterable = (function () {
                             }
 
                             v = _step11.value;
-                            selected = selector(v);
+                            selected = hasher(v);
 
                             if (!set['delete'](selected)) {
                                 context$3$0.next = 12;

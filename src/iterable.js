@@ -242,13 +242,13 @@ export default class Iterable {
 
     intersect(
           iter     : any
-        , selector : Function = x => x
+        , hasher : Function = x => x
     ): Iterable {
         let prev = this.data;
         this.data = function*() {
-            let set = new Set(Iterable.from(iter).select(selector).toArray());
+            let set = new Set(Iterable.from(iter).select(hasher).toArray());
             for (let v of expand(prev)) {
-                let selected = selector(v);
+                let selected = hasher(v);
                 if (set.delete(selected))
                     yield v;
             }
