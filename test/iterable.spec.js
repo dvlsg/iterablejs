@@ -1,3 +1,5 @@
+"use strict";
+
 import Iterable, { from, wrap, OrderedIterable, MultiIterable } from '../src/iterable.js';
 import assert from 'zana-assert';
 
@@ -75,7 +77,7 @@ describe('Iterable', () => {
         it('should construct a multi iterable with multiple arguments', () => {
             let iter = Iterable.from([1, 2], [3, 4]);
             assert.is(iter, MultiIterable);
-            assert.equal(iter.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);            
+            assert.equal(iter.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
         });
 
         it('should be exposed an alias for the exported from()', () => {
@@ -187,7 +189,7 @@ describe('Iterable', () => {
 
         it('should use a custom selector', () => {
             let iter = from([1, 2, 3, 4]);
-            assert.equal(iter.average(x => x*2), ((1*2 + 2*2 + 3*2 + 4*2) / 4));
+            assert.equal(iter.average(x => x * 2), ((1 * 2 + 2 * 2 + 3 * 2 + 4 * 2) / 4));
         });
 
     });
@@ -258,7 +260,7 @@ describe('Iterable', () => {
             assert.equal(iter.toArray(), [
                 {a: 1, b: 2, c: 2},
                 {a: 2, b: 1, c: 3},
-                {a: 4, b: 2, c: 3},
+                {a: 4, b: 2, c: 3}
             ]);
         });
 
@@ -314,7 +316,7 @@ describe('Iterable', () => {
             let iter = from([1, 2, 3, [4, 5, 6], 7, 8, [9, [10]]]);
             assert.equal(iter.flatten().toArray(), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-            let iter2 = from([1, 2, 3, [function*() { yield 4; yield [5, 6];}]]);
+            let iter2 = from([1, 2, 3, [function*() { yield 4; yield [5, 6]; }]]);
             assert.equal(iter2.flatten().toArray(), [1, 2, 3, 4, 5, 6]);
         });
 
@@ -434,7 +436,7 @@ describe('Iterable', () => {
             let iter2 = from([1, 2, 3]);
             assert.equal(iter2.length(), 3);
 
-            let iter3 = from(function*() { yield 1; yield 2; yield 3;});
+            let iter3 = from(function*() { yield 1; yield 2; yield 3; });
             assert.equal(iter3.length(), 3);
         });
 
@@ -498,7 +500,7 @@ describe('Iterable', () => {
                 {a: 2, b: 4, c: 4},
                 {a: 3, b: 7, c: 3},
                 {a: 4, b: 4, c: 2},
-                {a: 5, b: 2, c: 1},
+                {a: 5, b: 2, c: 1}
             ]);
             assert.equal(iter.max(x => x.b), 7);
         });
@@ -542,7 +544,7 @@ describe('Iterable', () => {
                 {a: 2, b: 4, c: 4},
                 {a: 3, b: 2, c: 3},
                 {a: 4, b: 4, c: 2},
-                {a: 5, b: 7, c: 1},
+                {a: 5, b: 7, c: 1}
             ]);
             assert.equal(iter.min(x => x.b), 2);
         });
@@ -636,7 +638,7 @@ describe('Iterable', () => {
 
         it('should yield selected / mapped elements', () => {
             let iter1 = from([1, 2, 3]);
-            assert.equal(iter1.select(x => x*2).toArray(), [2, 4, 6]);
+            assert.equal(iter1.select(x => x * 2).toArray(), [2, 4, 6]);
 
             let iter2 = from([
                 {a: 1, b: 2, c: 5},
@@ -702,7 +704,7 @@ describe('Iterable', () => {
 
         it('should use a custom selector', () => {
             let iter = from([1, 2, 3, 4]);
-            assert.equal(iter.sum(x => x*2), (1*2 + 2*2 + 3*2 + 4*2));
+            assert.equal(iter.sum(x => x * 2), (1 * 2 + 2 * 2 + 3 * 2 + 4 * 2));
         });
 
     });
@@ -885,11 +887,11 @@ describe('Iterable', () => {
                     return x;
                 });
             let i = 0;
-            for (let v of iter)
+            let it = iter[Symbol.iterator]();
+            while (!it.next().done)
                 assert.equal(++i, count);
-
             i *= 2;
-            let arr2 = iter.toArray();
+            iter.toArray();
             assert.equal(i, count);
         });
 
