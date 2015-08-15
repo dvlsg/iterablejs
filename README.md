@@ -53,6 +53,53 @@ let iterable = iter([1, 2, 3, 4, 5]);
 
 ## API
 
+### Links
+
+* Iterable
+    * [#aggregate](#aggregate)
+    * [#any](#any)
+    * [#at](#at)
+    * [#average](#average)
+    * [#concat](#concat)
+    * [#contains](#contains)
+    * [#distinct](#distinct)
+    * [#empty](#empty)
+    * [#every](#every)
+    * [#filter](#filter)
+    * [#first](#first)
+    * [#flatten](#flatten)
+    * [#full](#full)
+    * [#intersect](#intersect)
+    * [.iter](#iter)
+    * [#join](#join)
+    * [#last](#last)
+    * [#length](#length)
+    * [#map](#map)
+    * [#max](#max)
+    * [#merge](#merge)
+    * [#min](#min)
+    * [#orderBy](#orderby)
+    * [#orderByDescending](#orderbydescending)
+    * [#reduce](#reduce)
+    * [#reverse](#reverse)
+    * [#select](#select)
+    * [#skip](#skip)
+    * [#sum](#sum)
+    * [#take](#take)
+    * [#takeWhile](#takewhile)
+    * [#toArray](#toarray)
+    * [#union](#union)
+    * [#where](#where)
+    * [#while](#while)
+    * [#zip](#zip)
+* MultiIterable
+    * [#join](#join)
+* OrderedIterable
+    * [#thenBy](#thenby)
+    * [#thenByDescending](#thenbydescending)
+
+### Iterable
+
 #### #aggregate()
 
 ```js
@@ -252,9 +299,9 @@ let failed = iter([1, 2, '3', 4, 5]).every(x => typeof x === 'number');
 filter(predicate: Function): Iterable
 ```
 
-An alias for `where`.
+An alias for [where](#where).
 
-#### ##first()
+#### #first()
 
 ```js
 first(predicate: Function): Any
@@ -418,7 +465,7 @@ Note that if `length` is a property defined on the internal data and is a `Numbe
 map(selector: Function): Iterable
 ```
 
-An alias for `select`.
+An alias for [select](#select).
 
 #### #max()
 
@@ -450,7 +497,7 @@ let val = iter([
 merge(iter: Any): Iterable
 ```
 
-An alias for `zip`.
+An alias for [zip](#zip).
 
 #### #min()
 
@@ -540,6 +587,14 @@ let iterable = iter([
 ]).orderByDescending(x => x.a);
 //=> {a: 5, b: 6}, {a: 3, b: 4}, {a: 1, b: 2}
 ```
+
+#### #reduce()
+
+```js
+reduce(func: Function, seed: Any): Any
+```
+
+An alias for [aggregate](#aggregate).
 
 #### #reverse()
 
@@ -641,59 +696,7 @@ let iterable = iter([1, 2, 3, 4, 5]).take(6);
 takeWhile(predicate: Function): Iterable
 ```
 
-An alias for `while`.
-
-#### Ordered#thenBy()
-
-```js
-thenBy(selector: Function, comparer: Function, descending: Boolean): OrderedIterable
-```
-
-Returns an `OrderedIterable` with a subsequent level of sorting.
-
-```js
-let iterable = iter([
-    { id: 1, num: 11, num2: 44, num3: 88 },
-    { id: 2, num: 22, num2: 44, num3: 66 },
-    { id: 3, num: 22, num2: 33, num3: 77 },
-    { id: 4, num: 11, num2: 33, num3: 99 },
-    { id: 5, num: 22, num2: 44, num3: 55 }
-])
-.orderBy(x => x.num)
-.thenBy(x => x.num2);
-/*=> { id: 4, num: 11, num2: 33, num3: 99 },
-     { id: 1, num: 11, num2: 44, num3: 88 },
-     { id: 3, num: 22, num2: 33, num3: 77 },
-     { id: 2, num: 22, num2: 44, num3: 66 },
-     { id: 5, num: 22, num2: 44, num3: 55 } */
-```
-
-This method is only available on an `OrderedIterable`, and can make use of a custom comparer and descending flag in the same way as `orderBy()`.
-
-#### Ordered#thenByDescending()
-
-```js
-thenByDescending(selector: Function, comparer: Function): OrderedIterable
-```
-
-Returns an `OrderedIterable` with a subsequent level of sorting in descending order.
-
-```js
-let iterable = iter([
-    { id: 1, num: 11, num2: 44, num3: 88 },
-    { id: 2, num: 22, num2: 44, num3: 66 },
-    { id: 3, num: 22, num2: 33, num3: 77 },
-    { id: 4, num: 11, num2: 33, num3: 99 },
-    { id: 5, num: 22, num2: 44, num3: 55 }
-])
-.orderBy(x => x.num)
-.thenByDescending(x => x.num2);
-/*=> { id: 1, num: 11, num2: 44, num3: 88 },
-     { id: 4, num: 11, num2: 33, num3: 99 },
-     { id: 2, num: 22, num2: 44, num3: 66 },
-     { id: 5, num: 22, num2: 44, num3: 55 },
-     { id: 3, num: 22, num2: 33, num3: 77 } */
-```
+An alias for [while](#while).
 
 #### #toArray()
 
@@ -714,7 +717,7 @@ let arr = iter(function*() { yield 1; yield 2; yield 3; }).toArray();
 union(...args): Iterable
 ```
 
-An alias for `concat`.
+An alias for [concat](#concat).
 
 #### #where()
 
@@ -768,8 +771,6 @@ let iterable = Iterable.empty();
 //=> (empty)
 ```
 
-An alias for `Iterable.iter()`.
-
 #### .iter()
 
 ```js
@@ -798,4 +799,58 @@ let iterable = Iterable.iter([1, 2], [3, 4]);
      [1, 4],
      [2, 3],
      [2, 4] */
+```
+
+### OrderedIterable
+
+#### #thenBy()
+
+```js
+thenBy(selector: Function, comparer: Function, descending: Boolean): OrderedIterable
+```
+
+Returns an `OrderedIterable` with a subsequent level of sorting.
+
+```js
+let iterable = iter([
+    { id: 1, num: 11, num2: 44, num3: 88 },
+    { id: 2, num: 22, num2: 44, num3: 66 },
+    { id: 3, num: 22, num2: 33, num3: 77 },
+    { id: 4, num: 11, num2: 33, num3: 99 },
+    { id: 5, num: 22, num2: 44, num3: 55 }
+])
+.orderBy(x => x.num)
+.thenBy(x => x.num2);
+/*=> { id: 4, num: 11, num2: 33, num3: 99 },
+     { id: 1, num: 11, num2: 44, num3: 88 },
+     { id: 3, num: 22, num2: 33, num3: 77 },
+     { id: 2, num: 22, num2: 44, num3: 66 },
+     { id: 5, num: 22, num2: 44, num3: 55 } */
+```
+
+This method is only available on an `OrderedIterable`, and can make use of a custom comparer and descending flag in the same way as `orderBy()`.
+
+#### #thenByDescending()
+
+```js
+thenByDescending(selector: Function, comparer: Function): OrderedIterable
+```
+
+Returns an `OrderedIterable` with a subsequent level of sorting in descending order.
+
+```js
+let iterable = iter([
+    { id: 1, num: 11, num2: 44, num3: 88 },
+    { id: 2, num: 22, num2: 44, num3: 66 },
+    { id: 3, num: 22, num2: 33, num3: 77 },
+    { id: 4, num: 11, num2: 33, num3: 99 },
+    { id: 5, num: 22, num2: 44, num3: 55 }
+])
+.orderBy(x => x.num)
+.thenByDescending(x => x.num2);
+/*=> { id: 1, num: 11, num2: 44, num3: 88 },
+     { id: 4, num: 11, num2: 33, num3: 99 },
+     { id: 2, num: 22, num2: 44, num3: 66 },
+     { id: 5, num: 22, num2: 44, num3: 55 },
+     { id: 3, num: 22, num2: 33, num3: 77 } */
 ```
