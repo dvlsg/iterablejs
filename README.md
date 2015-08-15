@@ -231,6 +231,21 @@ let failed = iter([0, null, undefined, 4, '']).empty();
 //=> false
 ```
 
+#### #every()
+
+```js
+every(predicate: Function): Boolean
+```
+
+Returns a boolean indicating whether or not every element yielded from the `Iterable` passes a given predicate.
+
+```js
+let passed = iter([1, 2, 3, 4, 5]).every(x => typeof x === 'number');
+//=> true
+
+let failed = iter([1, 2, '3', 4, 5]).every(x => typeof x === 'number');
+//=> false 
+
 #### #filter()
 
 ```js
