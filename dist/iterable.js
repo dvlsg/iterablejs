@@ -383,7 +383,7 @@ var Iterable = (function () {
             }
 
             return new Iterable(_regeneratorRuntime.mark(function callee$2$0() {
-                var _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, iter, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, v;
+                var _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _iter, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, v;
 
                 return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                     while (1) switch (context$3$0.prev = context$3$0.next) {
@@ -400,12 +400,12 @@ var Iterable = (function () {
                                 break;
                             }
 
-                            iter = _step6.value;
+                            _iter = _step6.value;
                             _iteratorNormalCompletion7 = true;
                             _didIteratorError7 = false;
                             _iteratorError7 = undefined;
                             context$3$0.prev = 10;
-                            _iterator7 = _getIterator(expand(iter));
+                            _iterator7 = _getIterator(expand(_iter));
 
                         case 12:
                             if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
@@ -1400,8 +1400,8 @@ var Iterable = (function () {
             return new Iterable([]);
         }
     }, {
-        key: 'from',
-        value: function from() {
+        key: 'iter',
+        value: function iter() {
             for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
                 args[_key3] = arguments[_key3];
             }
@@ -1415,7 +1415,8 @@ var Iterable = (function () {
 
 exports['default'] = Iterable;
 
-Iterable.wrap = Iterable.from;
+Iterable.wrap = Iterable.iter;
+Iterable.from = Iterable.iter;
 Iterable.prototype.filter = Iterable.prototype.where;
 Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.merge = Iterable.prototype.zip;
@@ -1436,7 +1437,7 @@ var MultiIterable = (function (_Iterable) {
         this.iterables = [].concat(args);
         var self = this; // since we cant use arrow functions or bind with generators
         this.data = _regeneratorRuntime.mark(function callee$2$0() {
-            var marked3$0, expanded, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, iter, iterate;
+            var marked3$0, expanded, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, _iter2, iterate;
 
             return _regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
                 while (1) switch (context$3$0.prev = context$3$0.next) {
@@ -1535,9 +1536,9 @@ var MultiIterable = (function (_Iterable) {
                         context$3$0.prev = 6;
 
                         for (_iterator19 = _getIterator(self.iterables); !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
-                            iter = _step19.value;
+                            _iter2 = _step19.value;
 
-                            expanded.push(_Array$from(expand(iter)));
+                            expanded.push(_Array$from(expand(_iter2)));
                         }context$3$0.next = 14;
                         break;
 
@@ -1752,6 +1753,8 @@ var OrderedIterable = (function (_Iterable2) {
 })(Iterable);
 
 exports.OrderedIterable = OrderedIterable;
+var iter = Iterable.iter;
+exports.iter = iter;
 var from = Iterable.from;
 exports.from = from;
 var wrap = Iterable.wrap;

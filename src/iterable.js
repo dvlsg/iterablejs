@@ -108,7 +108,7 @@ export default class Iterable {
         return new Iterable([]);
     }
 
-    static from(...args) {
+    static iter(...args) {
         if (args.length === 1)
             return new Iterable(args[0]);
         else if (args.length > 1)
@@ -459,7 +459,8 @@ export default class Iterable {
     }
 }
 
-Iterable.wrap = Iterable.from;
+Iterable.wrap = Iterable.iter;
+Iterable.from = Iterable.iter;
 Iterable.prototype.filter = Iterable.prototype.where;
 Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.merge = Iterable.prototype.zip;
@@ -593,5 +594,6 @@ export class OrderedIterable extends Iterable {
     }
 }
 
+export var iter = Iterable.iter;
 export var from = Iterable.from;
 export var wrap = Iterable.wrap;
