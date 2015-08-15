@@ -1,4 +1,4 @@
-import Iterable, { from } from '../../dist/iterable.js';
+import Iterable from '../../dist/iterable.js';
 let log = ::console.log;
 
 let colors = [
@@ -147,7 +147,7 @@ let colors = [
 
 export async function run() {
     try {
-        let iter = new Iterable(colors)
+        let iterable = new Iterable(colors)
             .select(x => ({
                 name: x.name,
                 r: parseInt(x.hex[1] + x.hex[2], 16),
@@ -156,7 +156,7 @@ export async function run() {
             }))
             .orderBy(x => x.r + x.b + x.g);
 
-        for (let color of iter)
+        for (let color of iterable)
             log(`${color.name}: (${color.r}, ${color.g}, ${color.b})`);
     }
     catch(e) {

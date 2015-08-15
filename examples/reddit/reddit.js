@@ -1,4 +1,4 @@
-import Iterable, { from } from '../../dist/iterable.js';
+import { iter } from '../../dist/iterable.js';
 import api from './reddit-api.js';
 let log = ::console.log;
 
@@ -11,9 +11,9 @@ export async function run() {
         log('Sorting by most upvoted...');
         let data = json.data;
         let children = data.children;
-        let arr = from(children)
+        let arr = iter(children)
             .select(x => x.data)
-            .orderByDescending(x => x.ups)
+            .orderByDescending(x => x.ups - x.downs)
             .take(5)
             .select(x => ({
                 id      : x.id,
