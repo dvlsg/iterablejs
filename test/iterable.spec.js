@@ -1,6 +1,6 @@
 "use strict";
 
-import Iterable, { from, wrap, OrderedIterable, MultiIterable } from '../src/iterable.js';
+import Iterable, { iter, OrderedIterable, MultiIterable } from '../src/iterable.js';
 import assert from 'zana-assert';
 
 describe('Iterable', () => {
@@ -8,33 +8,33 @@ describe('Iterable', () => {
     describe('constructor()', () => {
 
         it('should return an empty iterable by default', () => {
-            let iter = new Iterable();
-            assert.equal(iter.toArray(), []);
+            let iterable = new Iterable();
+            assert.equal(iterable.toArray(), []);
         });
 
         it('should construct from an array', () => {
-            let iter = new Iterable([1, 2, 3]);
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = new Iterable([1, 2, 3]);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should construct from a generator function', () => {
-            let iter = new Iterable(function*() { yield 1; yield 2; yield 3; });
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = new Iterable(function*() { yield 1; yield 2; yield 3; });
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should construct from a generator', () => {
-            let iter = new Iterable(function*() { yield 1; yield 2; yield 3; }());
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = new Iterable(function*() { yield 1; yield 2; yield 3; }());
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should construct from a set', () => {
-            let iter = new Iterable(new Set([1, 2, 3, 1]));
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = new Iterable(new Set([1, 2, 3, 1]));
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should construct from a map', () => {
-            let iter = new Iterable(new Map([['a', 1], ['b', 2], ['c', 3]]));
-            assert.equal(iter.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
+            let iterable = new Iterable(new Map([['a', 1], ['b', 2], ['c', 3]]));
+            assert.equal(iterable.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
         });
 
         it('should construct from anything with [Symbol.iterator] defined', () => {
@@ -43,8 +43,8 @@ describe('Iterable', () => {
                     yield 1; yield 2; yield 3;
                 }
             };
-            let iter = new Iterable(obj);
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = new Iterable(obj);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
     });
@@ -52,73 +52,63 @@ describe('Iterable', () => {
     describe('[toStringTag]', () => {
 
         it('should return \'Iterable\'', () => {
-            let iter = new Iterable();
-            assert.equal(iter[Symbol.toStringTag], 'Iterable');
+            let iterable = new Iterable();
+            assert.equal(iterable[Symbol.toStringTag], 'Iterable');
             assert.equal(Object.prototype.toString.call(new Iterable()), '[object Iterable]');
             assert.equal(Object.prototype.toString.call(Iterable.prototype), '[object Iterable]');
         });
 
     });
 
-    describe('Iterable.from()', () => {
+    describe('.iter()', () => {
 
         it('should construct an empty iterable with no arguments', () => {
-            let iter = Iterable.from();
-            assert.is(iter, Iterable);
-            assert.equal(iter.toArray(), []);
+            let iterable = Iterable.iter();
+            assert.is(iterable, Iterable);
+            assert.equal(iterable.toArray(), []);
         });
 
         it('should construct an iterable with one argument', () => {
-            let iter = Iterable.from([1, 2, 3]);
-            assert.is(iter, Iterable);
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = Iterable.iter([1, 2, 3]);
+            assert.is(iterable, Iterable);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should construct a multi iterable with multiple arguments', () => {
-            let iter = Iterable.from([1, 2], [3, 4]);
-            assert.is(iter, MultiIterable);
-            assert.equal(iter.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+            let iterable = Iterable.iter([1, 2], [3, 4]);
+            assert.is(iterable, MultiIterable);
+            assert.equal(iterable.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
         });
 
-        it('should be exposed an alias for the exported from()', () => {
-            assert.equal(from, Iterable.from);
+        it('should be exposed an alias for the exported iter()', () => {
+            assert.equal(iter, Iterable.iter);
         });
 
     });
 
-    describe('Iterable.empty()', () => {
+    describe('.empty()', () => {
 
         it('should construct an empty iterable', () => {
-            let iter = Iterable.empty();
-            assert.is(iter, Iterable);
-            assert.equal(iter.toArray(), []);
+            let iterable = Iterable.empty();
+            assert.is(iterable, Iterable);
+            assert.equal(iterable.toArray(), []);
         });
 
     });
 
-    describe('Iterable.wrap()', () => {
-
-        it('should be an alias for Iterable.from()', () => {
-            assert.equal(Iterable.wrap, Iterable.from);
-            assert.equal(wrap, from);
-            assert.equal(Iterable.wrap, wrap);
-        });
-
-    });
-
-    describe('aggregate()', () => {
+    describe('#aggregate()', () => {
 
         it('should reduce an iterable to a single value', () => {
-            let iter = from([1, 2, 3, 4, 5]);
-            let val = iter.aggregate((carry, current) => {
+            let iterable = iter([1, 2, 3, 4, 5]);
+            let val = iterable.aggregate((carry, current) => {
                 return carry + current;
             });
             assert.equal(val, 15);
         });
 
         it('should use a seed', () => {
-            let iter = from([2, 3, 4, 5]);
-            let val = iter.aggregate((carry, current) => {
+            let iterable = iter([2, 3, 4, 5]);
+            let val = iterable.aggregate((carry, current) => {
                 return carry + current;
             }, 1);
             assert.equal(val, 15);
@@ -126,136 +116,136 @@ describe('Iterable', () => {
 
     });
 
-    describe('any()', () => {
+    describe('#any()', () => {
 
         it('should return true when the iterable contains values != null', () => {
-            let iter = from([null, null, 1, undefined, null]);
-            assert.true(iter.any());
+            let iterable = iter([null, null, 1, undefined, null]);
+            assert.true(iterable.any());
         });
 
         it('should return false when the iterable does not contain values != null', () => {
-            let iter = from([null, null, undefined, undefined, null]);
-            assert.false(iter.any());
+            let iterable = iter([null, null, undefined, undefined, null]);
+            assert.false(iterable.any());
 
             let iter2 = new Iterable();
             assert.false(iter2.any());
         });
 
         it('should use a custom predicate', () => {
-            let iter = from([null, null, undefined, null]);
-            assert.true(iter.any(x => x === undefined));
+            let iterable = iter([null, null, undefined, null]);
+            assert.true(iterable.any(x => x === undefined));
         });
 
     });
 
-    describe('at()', () => {
+    describe('#at()', () => {
 
         it('should return a value at a given zero-based index', () => {
-            let iter = from(function*() { yield 1; yield 2; yield 3; });
-            assert.equal(iter.at(2), 3);
+            let iterable = iter(function*() { yield 1; yield 2; yield 3; });
+            assert.equal(iterable.at(2), 3);
         });
 
         it('should return undefined with index out of bounds', () => {
-            let iter = from(function*() { yield 1; yield 2; yield 3; });
-            assert.equal(iter.at(3), undefined);
+            let iterable = iter(function*() { yield 1; yield 2; yield 3; });
+            assert.equal(iterable.at(3), undefined);
 
             let iter2 = new Iterable();
             assert.equal(iter2.at(0), undefined);
         });
 
         it('should return undefined with no index', () => {
-            let iter = from(function*() { yield 1; yield 2; yield 3; });
-            assert.equal(iter.at(), undefined);
+            let iterable = iter(function*() { yield 1; yield 2; yield 3; });
+            assert.equal(iterable.at(), undefined);
         });
 
     });
 
-    describe('average()', () => {
+    describe('#average()', () => {
 
         it('should return the average of iterated numbers', () => {
-            let iter = from([1, 2, 3, 4]);
-            assert.equal(iter.average(), ((1 + 2 + 3 + 4) / 4));
+            let iterable = iter([1, 2, 3, 4]);
+            assert.equal(iterable.average(), ((1 + 2 + 3 + 4) / 4));
         });
 
         it('should consider all non-numbers to be 0', () => {
-            let iter = from([1, 2, undefined, '3', 4]);
-            assert.equal(iter.average(), ((1 + 2 + 0 + 0 + 4) / 5));
+            let iterable = iter([1, 2, undefined, '3', 4]);
+            assert.equal(iterable.average(), ((1 + 2 + 0 + 0 + 4) / 5));
         });
 
         it('should return 0 from an empty iterable', () => {
-            let iter = new Iterable();
-            assert.equal(iter.average(), 0);
+            let iterable = new Iterable();
+            assert.equal(iterable.average(), 0);
         });
 
         it('should use a custom selector', () => {
-            let iter = from([1, 2, 3, 4]);
-            assert.equal(iter.average(x => x * 2), ((1 * 2 + 2 * 2 + 3 * 2 + 4 * 2) / 4));
+            let iterable = iter([1, 2, 3, 4]);
+            assert.equal(iterable.average(x => x * 2), ((1 * 2 + 2 * 2 + 3 * 2 + 4 * 2) / 4));
         });
 
     });
 
-    describe('concat()', () => {
+    describe('#concat()', () => {
 
         it('should yield concatenated iterables', () => {
-            let iter = from([1, 2, 3]).concat([4, 5, 6]);
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5, 6]);
+            let iterable = iter([1, 2, 3]).concat([4, 5, 6]);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5, 6]);
         });
 
         it('should be able to concatenate an iterable with itself', () => {
-            let iter = from([1, 2, 3]);
-            iter = iter.concat(iter);
-            assert.equal(iter.toArray(), [1, 2, 3, 1, 2, 3]);
+            let iterable = iter([1, 2, 3]);
+            iterable = iterable.concat(iterable);
+            assert.equal(iterable.toArray(), [1, 2, 3, 1, 2, 3]);
         });
 
         it('should be able to concatenate multiple iterables', () => {
-            let iter1 = from([1, 2]);
-            let iter2 = from([3, 4]);
-            let iter3 = from([5, 6]);
+            let iter1 = iter([1, 2]);
+            let iter2 = iter([3, 4]);
+            let iter3 = iter([5, 6]);
             assert.equal(iter1.concat(iter2, iter3).toArray(), [1, 2, 3, 4, 5, 6]);
         });
 
     });
 
-    describe('contains()', () => {
+    describe('#contains()', () => {
 
         it('should return true if iterable contains the provided item', () => {
-            let iter = from([1, 2, 3, 4, 5]);
-            assert.true(iter.contains(3));
+            let iterable = iter([1, 2, 3, 4, 5]);
+            assert.true(iterable.contains(3));
         });
 
         it('should return false if iterable does not contain the provided item', () => {
-            let iter = from([1, 2, 3, 4, 5]);
-            assert.false(iter.contains(7));
+            let iterable = iter([1, 2, 3, 4, 5]);
+            assert.false(iterable.contains(7));
         });
 
         it('should use a deep equality comparison by default', () => {
-            let iter = from([
+            let iterable = iter([
                 {a: 1},
                 {b: 2},
                 {c: 3},
                 {d: [1, 2, 3]}
             ]);
-            assert.true(iter.contains({d: [1, 2, 3]}));
+            assert.true(iterable.contains({d: [1, 2, 3]}));
         });
 
     });
 
-    describe('distinct()', () => {
+    describe('#distinct()', () => {
 
         it('should yield only distinct elements', () => {
-            let iter = from([1, 2, 3, 1]);
-            assert.equal(iter.distinct().toArray(), [1, 2, 3]);
+            let iterable = iter([1, 2, 3, 1]);
+            assert.equal(iterable.distinct().toArray(), [1, 2, 3]);
         });
 
         it('should yield only distinct elements by custom hashing function', () => {
-            let iter = from([
+            let iterable = iter([
                 {a: 1, b: 2, c: 2},
                 {a: 2, b: 1, c: 3},
                 {a: 3, b: 2, c: 2},
                 {a: 4, b: 2, c: 3},
                 {a: 5, b: 2, c: 2}
             ]).distinct(x => `bob${x.b}${x.c}`);
-            assert.equal(iter.toArray(), [
+            assert.equal(iterable.toArray(), [
                 {a: 1, b: 2, c: 2},
                 {a: 2, b: 1, c: 3},
                 {a: 4, b: 2, c: 3}
@@ -264,99 +254,99 @@ describe('Iterable', () => {
 
     });
 
-    describe('empty()', () => {
+    describe('#empty()', () => {
 
         it('should return true if all iterated values are null or undefined', () => {
             let undef;
-            let iter = from([undefined, null, null, undefined, undef]);
-            assert.true(iter.empty());
+            let iterable = iter([undefined, null, null, undefined, undef]);
+            assert.true(iterable.empty());
         });
 
         it('should return false if any iterated value is not null or undefined', () => {
             let undef;
-            let iter = from([undefined, null, 1, undefined, undef]);
-            assert.false(iter.empty());
+            let iterable = iter([undefined, null, 1, undefined, undef]);
+            assert.false(iterable.empty());
         });
 
     });
 
-    describe('filter()', () => {
+    describe('#filter()', () => {
 
         it('should be an alias for where()', () => {
-            let iter = from([1, 2, 3]);
-            assert.equal(iter.filter, iter.where);
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.filter, iterable.where);
         });
 
     });
 
-    describe('first()', () => {
+    describe('#first()', () => {
 
         it('should return the first element of an iterable', () => {
-            let iter = from([1, 2, 3]);
-            assert.equal(iter.first(), 1);
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.first(), 1);
         });
 
         it('should return the first element matching a given predicate', () => {
-            let iter = from([1, 2, 3]);
-            assert.equal(iter.first(x => x > 2), 3);
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.first(x => x > 2), 3);
         });
 
         it('should return undefined from an empty iterable', () => {
-            let iter = from([]);
-            assert.equal(iter.first(), undefined);
+            let iterable = iter([]);
+            assert.equal(iterable.first(), undefined);
         });
 
     });
 
-    describe('flatten()', () => {
+    describe('#flatten()', () => {
 
         it('should yield all non-iterable elements from a multi-tiered iterable', () => {
-            let iter = from([1, 2, 3, [4, 5, 6], 7, 8, [9, [10]]]);
-            assert.equal(iter.flatten().toArray(), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+            let iterable = iter([1, 2, 3, [4, 5, 6], 7, 8, [9, [10]]]);
+            assert.equal(iterable.flatten().toArray(), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-            let iter2 = from([1, 2, 3, [function*() { yield 4; yield [5, 6]; }]]);
+            let iter2 = iter([1, 2, 3, [function*() { yield 4; yield [5, 6]; }]]);
             assert.equal(iter2.flatten().toArray(), [1, 2, 3, 4, 5, 6]);
         });
 
     });
 
-    describe('full()', () => {
+    describe('#full()', () => {
 
         it('should return true if all iterated values are null or undefined', () => {
             let undef;
-            let iter = from([undefined, null, null, undefined, undef]);
-            assert.true(iter.empty());
+            let iterable = iter([undefined, null, null, undefined, undef]);
+            assert.true(iterable.empty());
         });
 
         it('should return false if any iterated value is not null or undefined', () => {
             let undef;
-            let iter = from([undefined, null, 1, undefined, undef]);
-            assert.false(iter.empty());
+            let iterable = iter([undefined, null, 1, undefined, undef]);
+            assert.false(iterable.empty());
         });
 
     });
 
-    describe('intersect()', () => {
+    describe('#intersect()', () => {
 
         it('should yield only the intersection of both iterables', () => {
-            let iter = from([1, 2, 3, 4, 5]);
-            assert.equal(iter.intersect([1, 3, 5, 7, 9]).toArray(), [1, 3, 5]);
+            let iterable = iter([1, 2, 3, 4, 5]);
+            assert.equal(iterable.intersect([1, 3, 5, 7, 9]).toArray(), [1, 3, 5]);
         });
 
         it('should yield only distinct elements from the intersection', () => {
-            let iter = from([1, 2, 3, 4, 5]);
-            assert.equal(iter.intersect([1, 1, 3, 3, 3, 5, 7, 9, 3]).toArray(), [1, 3, 5]);
+            let iterable = iter([1, 2, 3, 4, 5]);
+            assert.equal(iterable.intersect([1, 1, 3, 3, 3, 5, 7, 9, 3]).toArray(), [1, 3, 5]);
         });
 
         it('should use a custom hashing function to determine intersection', () => {
-            let iter1 = from([
+            let iter1 = iter([
                 {a: 1, b: 2, c: 5},
                 {a: 2, b: 2, c: 4},
                 {a: 3, b: 2, c: 3},
                 {a: 4, b: 2, c: 2},
                 {a: 5, b: 2, c: 1}
             ]);
-            let iter2 = from([
+            let iter2 = iter([
                 {a: 9, b: 2, c: 1},
                 {a: 7, b: 2, c: 2},
                 {a: 5, b: 2, c: 3},
@@ -376,22 +366,22 @@ describe('Iterable', () => {
 
     });
 
-    describe('join()', () => {
+    describe('#join()', () => {
 
         it('should return a MultiIterable', () => {
-            let iter = from([1, 2]).join([3, 4]);
-            assert.is(iter, MultiIterable);
-            assert.instance(iter, MultiIterable);
+            let iterable = iter([1, 2]).join([3, 4]);
+            assert.is(iterable, MultiIterable);
+            assert.instance(iterable, MultiIterable);
         });
 
         it('should yield a cartesian product of all iterables', () => {
-            let iter = from([1, 2]).join([3, 4]);
-            assert.equal(iter.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+            let iterable = iter([1, 2]).join([3, 4]);
+            assert.equal(iterable.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
         });
 
         it('should accept more than one argument', () => {
-            let iter = from([1, 2]).join([3, 4], [5, 6]);
-            assert.equal(iter.toArray(), [
+            let iterable = iter([1, 2]).join([3, 4], [5, 6]);
+            assert.equal(iterable.toArray(), [
                 [1, 3, 5],
                 [1, 3, 6],
                 [1, 4, 5],
@@ -406,35 +396,35 @@ describe('Iterable', () => {
 
     });
 
-    describe('last()', () => {
+    describe('#last()', () => {
 
         it('should return the last element of an iterable', () => {
-            let iter = from([1, 2, 3]);
-            assert.equal(iter.last(), 3);
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.last(), 3);
         });
 
         it('should return the last element matching a given predicate', () => {
-            let iter = from([1, 2, 3]);
-            assert.equal(iter.last(x => x < 3), 2);
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.last(x => x < 3), 2);
         });
 
         it('should return undefined from an empty iterable', () => {
-            let iter = from([]);
-            assert.equal(iter.last(), undefined);
+            let iterable = iter([]);
+            assert.equal(iterable.last(), undefined);
         });
 
     });
 
-    describe('length()', () => {
+    describe('#length()', () => {
 
         it('should return the length of an iterable', () => {
-            let iter1 = from([]);
+            let iter1 = iter([]);
             assert.equal(iter1.length(), 0);
 
-            let iter2 = from([1, 2, 3]);
+            let iter2 = iter([1, 2, 3]);
             assert.equal(iter2.length(), 3);
 
-            let iter3 = from(function*() { yield 1; yield 2; yield 3; });
+            let iter3 = iter(function*() { yield 1; yield 2; yield 3; });
             assert.equal(iter3.length(), 3);
         });
 
@@ -453,128 +443,128 @@ describe('Iterable', () => {
                     return 5;
                 }
             }
-            let iter = from(new A());
-            assert.equal(iter.length(), 5);
+            let iterable = iter(new A());
+            assert.equal(iterable.length(), 5);
             assert.false(iterated);
             assert.true(property);
         });
 
     });
 
-    describe('map()', () => {
+    describe('#map()', () => {
 
         it('should be an alias for select()', () => {
-            let iter = new Iterable();
-            assert.equal(iter.map, iter.select);
+            let iterable = new Iterable();
+            assert.equal(iterable.map, iterable.select);
         });
 
     });
 
-    describe('max()', () => {
+    describe('#max()', () => {
 
         it('should return a max of iterated numbers', () => {
-            let iter = from([1, 4, 3, 4, 9, 0]);
-            assert.equal(iter.max(), 9);
+            let iterable = iter([1, 4, 3, 4, 9, 0]);
+            assert.equal(iterable.max(), 9);
         });
 
         it('should ignore all non-numbers', () => {
-            let iter = from([1, 4, undefined, '3', 4, '9', 0]);
-            assert.equal(iter.max(), 4);
+            let iterable = iter([1, 4, undefined, '3', 4, '9', 0]);
+            assert.equal(iterable.max(), 4);
         });
 
         it('should return undefined from an empty iterable', () => {
-            let iter = new Iterable();
-            assert.equal(iter.max(), undefined);
+            let iterable = new Iterable();
+            assert.equal(iterable.max(), undefined);
         });
 
         it('should return undefined from an iterable not containing numbers', () => {
-            let iter = from(['1', '2', '3']);
-            assert.equal(iter.max(), undefined);
+            let iterable = iter(['1', '2', '3']);
+            assert.equal(iterable.max(), undefined);
         });
 
         it('should use a custom selector', () => {
-            let iter = from([
+            let iterable = iter([
                 {a: 1, b: 2, c: 5},
                 {a: 2, b: 4, c: 4},
                 {a: 3, b: 7, c: 3},
                 {a: 4, b: 4, c: 2},
                 {a: 5, b: 2, c: 1}
             ]);
-            assert.equal(iter.max(x => x.b), 7);
+            assert.equal(iterable.max(x => x.b), 7);
         });
 
     });
 
-    describe('merge()', () => {
+    describe('#merge()', () => {
 
         it('should be an alias for zip()', () => {
-            let iter = new Iterable();
-            assert.equal(iter.merge, iter.zip);
+            let iterable = new Iterable();
+            assert.equal(iterable.merge, iterable.zip);
         });
 
     });
 
-    describe('min()', () => {
+    describe('#min()', () => {
 
         it('should return a min of iterated numbers', () => {
-            let iter = from([8, 4, 2, 4, 9, 7]);
-            assert.equal(iter.min(), 2);
+            let iterable = iter([8, 4, 2, 4, 9, 7]);
+            assert.equal(iterable.min(), 2);
         });
 
         it('should ignore all non-numbers', () => {
-            let iter = from([1, 4, undefined, '3', 4, '9', 0]);
-            assert.equal(iter.min(), 0);
+            let iterable = iter([1, 4, undefined, '3', 4, '9', 0]);
+            assert.equal(iterable.min(), 0);
         });
 
         it('should return undefined from an empty iterable', () => {
-            let iter = new Iterable();
-            assert.equal(iter.min(), undefined);
+            let iterable = new Iterable();
+            assert.equal(iterable.min(), undefined);
         });
 
         it('should return undefined from an iterable not containing numbers', () => {
-            let iter = from(['1', '2', '3']);
-            assert.equal(iter.min(), undefined);
+            let iterable = iter(['1', '2', '3']);
+            assert.equal(iterable.min(), undefined);
         });
 
         it('should use a custom selector', () => {
-            let iter = from([
+            let iterable = iter([
                 {a: 1, b: 7, c: 5},
                 {a: 2, b: 4, c: 4},
                 {a: 3, b: 2, c: 3},
                 {a: 4, b: 4, c: 2},
                 {a: 5, b: 7, c: 1}
             ]);
-            assert.equal(iter.min(x => x.b), 2);
+            assert.equal(iterable.min(x => x.b), 2);
         });
 
     });
 
-    describe('orderBy()', () => {
+    describe('#orderBy()', () => {
 
         it('should return an OrderedIterable', () => {
-            let iter = from([1, 2, 3]).orderBy(x => x);
-            assert.is(iter, OrderedIterable);
-            assert.instance(iter, OrderedIterable);
+            let iterable = iter([1, 2, 3]).orderBy(x => x);
+            assert.is(iterable, OrderedIterable);
+            assert.instance(iterable, OrderedIterable);
         });
 
         it('should determine order using elements from a selector', () => {
-            let iter = from([3, 1, 2]).orderBy(x => x);
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = iter([3, 1, 2]).orderBy(x => x);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should determine order by a given comparer', () => {
             let comparer = (x, y) => x > y ? -1 : x < y ? 1 : 0;
-            let iter = from([3, 1, 2]).orderBy(x => x, comparer);
-            assert.equal(iter.toArray(), [3, 2, 1]);
+            let iterable = iter([3, 1, 2]).orderBy(x => x, comparer);
+            assert.equal(iterable.toArray(), [3, 2, 1]);
         });
 
         it('should set descending by flag', () => {
-            let iter = from([3, 1, 2]).orderBy(x => x, undefined, true);
-            assert.equal(iter.toArray(), [3, 2, 1]);
+            let iterable = iter([3, 1, 2]).orderBy(x => x, undefined, true);
+            assert.equal(iterable.toArray(), [3, 2, 1]);
         });
 
         it('should use a stable sort', () => {
-            let iter = from([
+            let iterable = iter([
                 { id: 1, num: 22, num2: 99 },
                 { id: 2, num: 33, num2: 44 },
                 { id: 3, num: 22, num2: 44 },
@@ -585,7 +575,7 @@ describe('Iterable', () => {
                 { id: 8, num: 33, num2: 99 },
                 { id: 9, num: 22, num2: 44 }
             ]).orderBy(x => x.num);
-            assert.equal(iter.toArray(), [
+            assert.equal(iterable.toArray(), [
                 { id: 1, num: 22, num2: 99 },
                 { id: 3, num: 22, num2: 44 },
                 { id: 6, num: 22, num2: 99 },
@@ -600,45 +590,45 @@ describe('Iterable', () => {
 
     });
 
-    describe('orderByDescending()', () => {
+    describe('#orderByDescending()', () => {
 
         it('should be a method for orderBy(selector, comparer, descending=true)', () => {
             let arr = [3, 1, 2, 8, 6, 3, 1, 6, 8, 2];
-            let iter1 = from(arr).orderBy(x => x, undefined, true);
-            let iter2 = from(arr).orderByDescending(x => x);
+            let iter1 = iter(arr).orderBy(x => x, undefined, true);
+            let iter2 = iter(arr).orderByDescending(x => x);
             assert.equal(iter1.toArray(), iter2.toArray());
         });
 
     });
 
-    describe('reduce()', () => {
+    describe('#reduce()', () => {
 
         it('should be an alias for aggregate()', () => {
-            let iter = new Iterable();
-            assert.equal(iter.reduce, iter.aggregate);
+            let iterable = new Iterable();
+            assert.equal(iterable.reduce, iterable.aggregate);
         });
 
     });
 
-    describe('reverse()', () => {
+    describe('#reverse()', () => {
 
         it('should yield iterable elements in reverse', () => {
-            let iter1 = from([1, 2, 3, 4, 5]);
+            let iter1 = iter([1, 2, 3, 4, 5]);
             assert.equal(iter1.reverse().toArray(), [5, 4, 3, 2, 1]);
 
-            let iter2 = from(function*() { yield 1; yield 2; yield 3; });
+            let iter2 = iter(function*() { yield 1; yield 2; yield 3; });
             assert.equal(iter2.reverse().toArray(), [3, 2, 1]);
         });
 
     });
 
-    describe('select()', () => {
+    describe('#select()', () => {
 
         it('should yield selected / mapped elements', () => {
-            let iter1 = from([1, 2, 3]);
+            let iter1 = iter([1, 2, 3]);
             assert.equal(iter1.select(x => x * 2).toArray(), [2, 4, 6]);
 
-            let iter2 = from([
+            let iter2 = iter([
                 {a: 1, b: 2, c: 5},
                 {a: 2, b: 4, c: 4},
                 {a: 3, b: 7, c: 3},
@@ -661,133 +651,133 @@ describe('Iterable', () => {
 
     });
 
-    describe('skip()', () => {
+    describe('#skip()', () => {
 
         it('should yield elements after provided skip count', () => {
-            let iter = from([1, 2, 3, 4, 5, 6, 7, 8, 9]).skip(4);
-            assert.equal(iter.toArray(), [5, 6, 7, 8, 9]);
+            let iterable = iter([1, 2, 3, 4, 5, 6, 7, 8, 9]).skip(4);
+            assert.equal(iterable.toArray(), [5, 6, 7, 8, 9]);
         });
 
         it('should yield no elements if count is greater than length', () => {
-            let iter = from([1, 2, 3]).skip(4);
-            assert.equal(iter.toArray(), []);
+            let iterable = iter([1, 2, 3]).skip(4);
+            assert.equal(iterable.toArray(), []);
         });
 
         it('should yield all elements if count is not positive', () => {
-            let iter1 = from([1, 2, 3]).skip(0);
+            let iter1 = iter([1, 2, 3]).skip(0);
             assert.equal(iter1.toArray(), [1, 2, 3]);
 
-            let iter2 = from([1, 2, 3]).skip(-20);
+            let iter2 = iter([1, 2, 3]).skip(-20);
             assert.equal(iter2.toArray(), [1, 2, 3]);
         });
 
     });
 
-    describe('sum()', () => {
+    describe('#sum()', () => {
 
         it('should return the sum of iterated numbers', () => {
-            let iter = from([1, 2, 3, 4]);
-            assert.equal(iter.sum(), (1 + 2 + 3 + 4));
+            let iterable = iter([1, 2, 3, 4]);
+            assert.equal(iterable.sum(), (1 + 2 + 3 + 4));
         });
 
         it('should consider all non-numbers to be 0', () => {
-            let iter = from([1, 2, undefined, '3', 4]);
-            assert.equal(iter.sum(), (1 + 2 + 0 + 0 + 4));
+            let iterable = iter([1, 2, undefined, '3', 4]);
+            assert.equal(iterable.sum(), (1 + 2 + 0 + 0 + 4));
         });
 
         it('should return 0 from an empty iterable', () => {
-            let iter = new Iterable();
-            assert.equal(iter.sum(), 0);
+            let iterable = new Iterable();
+            assert.equal(iterable.sum(), 0);
         });
 
         it('should use a custom selector', () => {
-            let iter = from([1, 2, 3, 4]);
-            assert.equal(iter.sum(x => x * 2), (1 * 2 + 2 * 2 + 3 * 2 + 4 * 2));
+            let iterable = iter([1, 2, 3, 4]);
+            assert.equal(iterable.sum(x => x * 2), (1 * 2 + 2 * 2 + 3 * 2 + 4 * 2));
         });
 
     });
 
-    describe('take()', () => {
+    describe('#take()', () => {
 
         it('should yield elements until the given take count', () => {
-            let iter = from([1, 2, 3, 4, 5, 6, 7, 8, 9]).take(4);
-            assert.equal(iter.toArray(), [1, 2, 3, 4]);
+            let iterable = iter([1, 2, 3, 4, 5, 6, 7, 8, 9]).take(4);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4]);
         });
 
         it('should take all elements if count is greater than length', () => {
-            let iter = from([1, 2, 3]).take(4);
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = iter([1, 2, 3]).take(4);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should yield no elements if count is non positive', () => {
-            let iter1 = from([1, 2, 3]).take(0);
+            let iter1 = iter([1, 2, 3]).take(0);
             assert.equal(iter1.toArray(), []);
 
-            let iter2 = from([1, 2, 3]).take(-20);
+            let iter2 = iter([1, 2, 3]).take(-20);
             assert.equal(iter2.toArray(), []);
         });
 
     });
 
-    describe('takeWhile()', () => {
+    describe('#takeWhile()', () => {
 
         it('should be an alias for while()', () => {
-            let iter = new Iterable();
-            assert.equal(iter.takeWhile, iter.while);
+            let iterable = new Iterable();
+            assert.equal(iterable.takeWhile, iterable.while);
         });
 
     });
 
-    describe('toArray()', () => {
+    describe('#toArray()', () => {
 
         it('should convert an iterable to an array', () => {
-            let iter1 = from([1, 2, 3]);
+            let iter1 = iter([1, 2, 3]);
             assert.equal(iter1.toArray(), [1, 2, 3]);
 
-            let iter2 = from(function*() { yield 1; yield 2; yield 3; });
+            let iter2 = iter(function*() { yield 1; yield 2; yield 3; });
             assert.equal(iter2.toArray(), [1, 2, 3]);
         });
 
     });
 
-    describe('union()', () => {
+    describe('#union()', () => {
 
         it('should be an alias for concat()', () => {
-            let iter = new Iterable();
-            assert.equal(iter.union, iter.concat);
+            let iterable = new Iterable();
+            assert.equal(iterable.union, iterable.concat);
         });
     });
 
-    describe('where()', () => {
+    describe('#where()', () => {
 
         it('should yield only elements passing a predicate', () => {
-            let iter = from([1, 2, 3, 4, 5]).where(x => x % 2 === 0);
-            assert.equal(iter.toArray(), [2, 4]);
+            let iterable = iter([1, 2, 3, 4, 5]).where(x => x % 2 === 0);
+            assert.equal(iterable.toArray(), [2, 4]);
         });
 
     });
 
-    describe('while()', () => {
+    describe('#while()', () => {
 
         it('should yield elements until a predicate fails', () => {
-            let iter = from([1, 2, 3, 4, 5, -1, 6, 7, 8]).while(x => x > 0);
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5]);
+            let iterable = iter([1, 2, 3, 4, 5, -1, 6, 7, 8]).while(x => x > 0);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
         });
 
     });
 
-    describe('zip()', () => {
+    describe('#zip()', () => {
 
         it('should zip two iterables together by selector', () => {
-            let iter = from([1, 2, 3, 4, 5]).zip([1, 3, 5, 7, 9], (x, y) => x + y);
-            assert.equal(iter.toArray(), [2, 5, 8, 11, 14]);
+            let iterable = iter([1, 2, 3, 4, 5]).zip([1, 3, 5, 7, 9], (x, y) => x + y);
+            assert.equal(iterable.toArray(), [2, 5, 8, 11, 14]);
         });
 
         it('should only yield zipped elements until one iterable is finished', () => {
-            let iter1 = from([1, 2, 3]).zip([1, 2, 3, 4, 5, 6, 7], (x, y) => x + y);
+            let iter1 = iter([1, 2, 3]).zip([1, 2, 3, 4, 5, 6, 7], (x, y) => x + y);
             assert.equal(iter1.toArray(), [2, 4, 6]);
 
-            let iter2 = from([1, 2, 3, 4, 5, 6, 7]).zip([1, 2, 3], (x, y) => x + y);
+            let iter2 = iter([1, 2, 3, 4, 5, 6, 7]).zip([1, 2, 3], (x, y) => x + y);
             assert.equal(iter2.toArray(), [2, 4, 6]);
         });
 
@@ -806,8 +796,8 @@ describe('Iterable', () => {
                 { a: 2, b: 3, c: [ 6, 7, 8, 9 ], d: 9 },
                 { a: 1, b: 2, c: [ 6, 7, 8, 9 ], d: 5 }
             ];
-            let iter = from(arr1).zip(arr2);
-            assert.equal(iter.toArray(), [
+            let iterable = iter(arr1).zip(arr2);
+            assert.equal(iterable.toArray(), [
                 { a: 1, b: 2, c: [ 3, 4, 5, 9 ], d: 9 },
                 { a: 2, b: 3, c: [ 3, 4, 5, 9 ], d: 5 },
                 { a: 3, b: 3, c: [ 3, 4, 5, 9 ], d: 5 },
@@ -836,7 +826,7 @@ describe('Iterable', () => {
                 { a: 1, b: 2, c: [ 1, 5, 9, 9 ], d: 5 }
             ];
 
-            let iter = from(arr1)
+            let iterable = iter(arr1)
                 .where(x => x.b === 3)
                 .join(arr2)
                 .where(([x, y]) => x.b === y.b)
@@ -846,14 +836,14 @@ describe('Iterable', () => {
                     c: x.c.concat(y.c),
                     d: y.d
                 }))
-                .distinct(x => from(x.c).sum())
+                .distinct(x => iter(x.c).sum())
                 .select(x => {
-                    x.c = from(x.c).sum();
+                    x.c = iter(x.c).sum();
                     return x;
                 })
                 .orderByDescending(x => x.d)
                 .thenBy(x => x.c);
-            assert.equal(iter.toArray(), [
+            assert.equal(iterable.toArray(), [
                 { a: 2, b: 3, c: 30, d: 9 },
                 { a: 3, b: 3, c: 33, d: 9 },
                 { a: 5, b: 3, c: 35, d: 9 },
@@ -876,7 +866,7 @@ describe('Iterable', () => {
                 { a: 4, b: 2, c: [ 6, 2, 5 ] },
                 { a: 5, b: 3, c: [ 3, 4, 5 ] }
             ];
-            let iter = from(arr1)
+            let iterable = iter(arr1)
                 .concat(arr1)
                 .concat(arr1)
                 .select(x => {
@@ -885,11 +875,11 @@ describe('Iterable', () => {
                     return x;
                 });
             let i = 0;
-            let it = iter[Symbol.iterator]();
+            let it = iterable[Symbol.iterator]();
             while (!it.next().done)
                 assert.equal(++i, count);
             i *= 2;
-            iter.toArray();
+            iterable.toArray();
             assert.equal(i, count);
         });
 
@@ -898,38 +888,38 @@ describe('Iterable', () => {
     describe('reusability', () => {
 
         it('should be re-iterable with arrays', () => {
-            let iter = from([1, 2, 3, 4, 5]);
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5]);
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5]);
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5]);
+            let iterable = iter([1, 2, 3, 4, 5]);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
         });
 
         it('should be re-iterable with sets', () => {
-            let iter = from(new Set([1, 2, 3, 4, 5]));
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5]);
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5]);
-            assert.equal(iter.toArray(), [1, 2, 3, 4, 5]);
+            let iterable = iter(new Set([1, 2, 3, 4, 5]));
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
+            assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
         });
 
         it('should be re-iterable with maps', () => {
-            let iter = from(new Map([['a', 1], ['b', 2], ['c', 3]]));
-            assert.equal(iter.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
-            assert.equal(iter.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
-            assert.equal(iter.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
+            let iterable = iter(new Map([['a', 1], ['b', 2], ['c', 3]]));
+            assert.equal(iterable.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
+            assert.equal(iterable.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
+            assert.equal(iterable.toArray(), [['a', 1], ['b', 2], ['c', 3]]);
         });
 
         it('should be re-iterable with generator functions', () => {
-            let iter = from(function*() { yield 1; yield 2; yield 3; });
-            assert.equal(iter.toArray(), [1, 2, 3]);
-            assert.equal(iter.toArray(), [1, 2, 3]);
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = iter(function*() { yield 1; yield 2; yield 3; });
+            assert.equal(iterable.toArray(), [1, 2, 3]);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should not be re-iterable with executed generator functions', () => {
-            let iter = from(function*() { yield 1; yield 2; yield 3; }());
-            assert.equal(iter.toArray(), [1, 2, 3]);
-            assert.equal(iter.toArray(), []);
-            assert.equal(iter.toArray(), []);
+            let iterable = iter(function*() { yield 1; yield 2; yield 3; }());
+            assert.equal(iterable.toArray(), [1, 2, 3]);
+            assert.equal(iterable.toArray(), []);
+            assert.equal(iterable.toArray(), []);
         });
 
     });
@@ -941,8 +931,8 @@ describe('MultiIterable', () => {
     describe('constructor()', () => {
 
         it('should accept multiple iterable items', () => {
-            let iter = new MultiIterable([1, 2], function*() { yield 3; yield 4; }, new Set([5, 6]));
-            assert.equal(iter.toArray(), [
+            let iterable = new MultiIterable([1, 2], function*() { yield 3; yield 4; }, new Set([5, 6]));
+            assert.equal(iterable.toArray(), [
                 [1, 3, 5],
                 [1, 3, 6],
                 [1, 4, 5],
@@ -959,21 +949,21 @@ describe('MultiIterable', () => {
     describe('[toStringTag]', () => {
 
         it('should return \'MultiIterable\'', () => {
-            let iter = new MultiIterable();
-            assert.equal(iter[Symbol.toStringTag], 'MultiIterable');
-            assert.equal(Object.prototype.toString.call(iter), '[object MultiIterable]');
+            let iterable = new MultiIterable();
+            assert.equal(iterable[Symbol.toStringTag], 'MultiIterable');
+            assert.equal(Object.prototype.toString.call(iterable), '[object MultiIterable]');
             assert.equal(Object.prototype.toString.call(MultiIterable.prototype), '[object MultiIterable]');
         });
 
     });
 
-    describe('join()', () => {
+    describe('#join()', () => {
 
         it('should dynamically join iterables', () => {
-            let iter = new MultiIterable([1, 2], [3, 4]);
-            assert.equal(iter.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
-            iter = iter.join([5, 6]);
-            assert.equal(iter.toArray(), [
+            let iterable = new MultiIterable([1, 2], [3, 4]);
+            assert.equal(iterable.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
+            iterable = iterable.join([5, 6]);
+            assert.equal(iterable.toArray(), [
                 [1, 3, 5],
                 [1, 3, 6],
                 [1, 4, 5],
@@ -994,24 +984,24 @@ describe('OrderedIterable', () => {
     describe('constructor()', () => {
 
         it('should accept an iterable', () => {
-            let iter = new OrderedIterable([3, 1, 2]);
-            assert.equal(iter.toArray(), [1, 2, 3]);
+            let iterable = new OrderedIterable([3, 1, 2]);
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
         it('should accept a custom selector', () => {
-            let iter = new OrderedIterable([3, 1, 2], x => -x);
-            assert.equal(iter.toArray(), [3, 2, 1]);
+            let iterable = new OrderedIterable([3, 1, 2], x => -x);
+            assert.equal(iterable.toArray(), [3, 2, 1]);
         });
 
         it('should accept a custom comparer', () => {
             let comparer = (x, y) => x > y ? -1 : x < y ? 1 : 0;
-            let iter = new OrderedIterable([3, 1, 2], undefined, comparer);
-            assert.equal(iter.toArray(), [3, 2, 1]);
+            let iterable = new OrderedIterable([3, 1, 2], undefined, comparer);
+            assert.equal(iterable.toArray(), [3, 2, 1]);
         });
 
         it('should set descending by flag', () => {
-            let iter = new OrderedIterable([3, 1, 2], undefined, undefined, true);
-            assert.equal(iter.toArray(), [3, 2, 1]);
+            let iterable = new OrderedIterable([3, 1, 2], undefined, undefined, true);
+            assert.equal(iterable.toArray(), [3, 2, 1]);
         });
 
     });
@@ -1019,15 +1009,15 @@ describe('OrderedIterable', () => {
     describe('[toStringTag]', () => {
 
         it('should return \'OrderedIterable\'', () => {
-            let iter = new OrderedIterable();
-            assert.equal(iter[Symbol.toStringTag], 'OrderedIterable');
-            assert.equal(Object.prototype.toString.call(iter), '[object OrderedIterable]');
+            let iterable = new OrderedIterable();
+            assert.equal(iterable[Symbol.toStringTag], 'OrderedIterable');
+            assert.equal(Object.prototype.toString.call(iterable), '[object OrderedIterable]');
             assert.equal(Object.prototype.toString.call(OrderedIterable.prototype), '[object OrderedIterable]');
         });
 
     });
 
-    describe('thenBy()', () => {
+    describe('#thenBy()', () => {
 
         it('should add another order without altering previous orders', () => {
             let arr1 = [
@@ -1038,8 +1028,8 @@ describe('OrderedIterable', () => {
                 { id: 5, num: 22, num2: 44, num3: 55 }
             ];
 
-            let iter = new OrderedIterable(arr1, x => x.num).thenBy(x => x.num2);
-            assert.equal(iter.toArray(), [
+            let iterable = new OrderedIterable(arr1, x => x.num).thenBy(x => x.num2);
+            assert.equal(iterable.toArray(), [
                 { id: 4, num: 11, num2: 33, num3: 99 },
                 { id: 1, num: 11, num2: 44, num3: 88 },
                 { id: 3, num: 22, num2: 33, num3: 77 },
@@ -1047,8 +1037,8 @@ describe('OrderedIterable', () => {
                 { id: 5, num: 22, num2: 44, num3: 55 }
             ]);
 
-            iter = iter.thenBy(x => x.num3);
-            assert.equal(iter.toArray(), [
+            iterable = iterable.thenBy(x => x.num3);
+            assert.equal(iterable.toArray(), [
                 { id: 4, num: 11, num2: 33, num3: 99 },
                 { id: 1, num: 11, num2: 44, num3: 88 },
                 { id: 3, num: 22, num2: 33, num3: 77 },
@@ -1065,10 +1055,10 @@ describe('OrderedIterable', () => {
                 { id: 4, num: 11, num2: 33, num3: 99 },
                 { id: 5, num: 22, num2: 44, num3: 55 }
             ];
-            let iter = from(arr1)
+            let iterable = iter(arr1)
                 .orderBy(x => x.num)
                 .thenBy(x => x.num2, (x, y) => x > y ? -1 : x < y ? 1 : 0);
-            assert.equal(iter.toArray(), [
+            assert.equal(iterable.toArray(), [
                 { id: 1, num: 11, num2: 44, num3: 88 },
                 { id: 4, num: 11, num2: 33, num3: 99 },
                 { id: 2, num: 22, num2: 44, num3: 66 },
@@ -1086,11 +1076,11 @@ describe('OrderedIterable', () => {
                 { id: 4, num: 11, num2: 33, num3: 99 },
                 { id: 5, num: 22, num2: 44, num3: 55 }
             ];
-            let iter = from(arr1)
+            let iterable = iter(arr1)
                 .orderBy(x => x.num)
                 .thenBy(x => x.num2, undefined, true)
                 .thenBy(x => x.num3, undefined, false);
-            assert.equal(iter.toArray(), [
+            assert.equal(iterable.toArray(), [
                 { id: 1, num: 11, num2: 44, num3: 88 },
                 { id: 4, num: 11, num2: 33, num3: 99 },
                 { id: 5, num: 22, num2: 44, num3: 55 },
@@ -1101,7 +1091,7 @@ describe('OrderedIterable', () => {
 
     });
 
-    describe('thenByDescending()', () => {
+    describe('#thenByDescending()', () => {
 
         it('should be a method for thenBy(selector, comparer, descending=true)', () => {
             let arr = [
@@ -1111,8 +1101,8 @@ describe('OrderedIterable', () => {
                 { id: 4, num: 11, num2: 33, num3: 99 },
                 { id: 5, num: 22, num2: 44, num3: 55 }
             ];
-            let iter1 = from(arr).orderBy(x => x.num).thenBy(x => x.num2, undefined, true);
-            let iter2 = from(arr).orderBy(x => x.num).thenByDescending(x => x.num2);
+            let iter1 = iter(arr).orderBy(x => x.num).thenBy(x => x.num2, undefined, true);
+            let iter2 = iter(arr).orderBy(x => x.num).thenByDescending(x => x.num2);
             assert.equal(iter1.toArray(), iter2.toArray());
         });
 
