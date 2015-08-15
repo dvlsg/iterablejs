@@ -291,7 +291,8 @@ let passed = iter([1, 2, 3, 4, 5]).every(x => typeof x === 'number');
 //=> true
 
 let failed = iter([1, 2, '3', 4, 5]).every(x => typeof x === 'number');
-//=> false 
+//=> false
+```
 
 #### #filter()
 
