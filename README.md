@@ -53,7 +53,7 @@ let iterable = iter([1, 2, 3, 4, 5]);
 
 ## API
 
-#### Iterable#aggregate()
+#### #aggregate()
 
 ```js
 aggregate(func: Function, seed: Any): Any
@@ -75,7 +75,7 @@ let val2 = iter([2, 3, 4, 5])
 //=> 15
 ```
 
-#### Iterable#any()
+#### #any()
 
 ```js
 any(predicate: Function): Boolean
@@ -101,7 +101,7 @@ let failed = iter([null, undefined, null]).any();
 //=> false
 ```
 
-#### Iterable#at()
+#### #at()
 
 ```js
 at(index: Number): Any
@@ -121,7 +121,7 @@ let val = iter([1, 2, 3, 4, 5]).at(6);
 //=> undefined
 ```
 
-#### Iterable#average()
+#### #average()
 
 ```js
 average(selector: Function): Number
@@ -145,7 +145,7 @@ let val = iter([
 //=> 3
 ```
 
-#### Iterable#concat()
+#### #concat()
 
 ```js
 concat(...args): Iterable
@@ -158,7 +158,7 @@ let iterable = iter([1, 2]).concat(new Set([3, 4]), function*() { yield 5; yield
 //=> 1, 2, 3, 4, 5, 6
 ```
 
-#### Iterable#contains()
+#### #contains()
 
 ```js
 contains(item: Any): Boolean
@@ -185,7 +185,7 @@ let passed = iter([
 //=> true
 ```
 
-#### Iterable#distinct()
+#### #distinct()
 
 ```js
 distinct(hasher: Function): Iterable
@@ -208,7 +208,7 @@ let iterable = iter([{a: 1}, {a: 1}]).distinct(x => x.a);
 //=> {a: 1}
 ```
 
-#### Iterable#empty()
+#### #empty()
 
 ```js
 empty(): Boolean
@@ -231,7 +231,7 @@ let failed = iter([0, null, undefined, 4, '']).empty();
 //=> false
 ```
 
-#### Iterable#filter()
+#### #filter()
 
 ```js
 filter(predicate: Function): Iterable
@@ -239,7 +239,7 @@ filter(predicate: Function): Iterable
 
 An alias for `where`.
 
-#### #Iterable#first()
+#### ##first()
 
 ```js
 first(predicate: Function): Any
@@ -266,7 +266,7 @@ let val = iter([1, 2, 3, 4, 5]).first(x => x > 5);
 //=> undefined
 ```
 
-#### Iterable#flatten()
+#### #flatten()
 
 ```js
 flatten(): Iterable
@@ -279,7 +279,7 @@ let iterable = iter([1, 2, 3, [4, 5, 6], [7, [8, [9]]]]).flatten();
 //=> 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
-#### Iterable#full()
+#### #full()
 
 ```js
 full(): Boolean
@@ -295,7 +295,7 @@ let failed = iter([1, 2, 3, '', 5]).full();
 //=> false
 ```
 
-#### Iterable#intersect()
+#### #intersect()
 
 ```js
 intersect(iter: Any, selector: Function): Iterable
@@ -315,7 +315,7 @@ let iterable = iter([{a: 1}, {a: 2}, {a: 3}]).intersect([{a: 1}, {a: 3}], x => x
 //=> {a: 1}, {a: 3}
 ```
 
-#### Iterable#join()
+#### #join()
 
 ```js
 join(...args): MultiIterable
@@ -355,7 +355,7 @@ iterable = iterable.join([5, 6]);
      [ 2, 4, 6 ] */
 ```
 
-#### Iterable#last()
+#### #last()
 
 ```js
 last(predicate: Function): Any
@@ -382,7 +382,7 @@ let val = iter([1, 2, 3, 4, 5]).last(x => x > 5);
 //=> undefined
 ```
 
-#### Iterable#length()
+#### #length()
 
 ```js
 length(): Number
@@ -397,7 +397,7 @@ let val = iter([1, 2, 3, 4, 5]).length();
 
 Note that if `length` is a property defined on the internal data and is a `Number`, then it will be used directly. If `length` is not available as a property, then the `Iterable` will be fully enumerated to determine length. 
 
-#### Iterable#map()
+#### #map()
 
 ```js
 map(selector: Function): Iterable
@@ -405,7 +405,7 @@ map(selector: Function): Iterable
 
 An alias for `select`.
 
-#### Iterable#max()
+#### #max()
 
 ```js
 max(selector: Function): Number
@@ -429,7 +429,7 @@ let val = iter([
 //=> 6
 ```
 
-#### Iterable#merge()
+#### #merge()
 
 ```js
 merge(iter: Any): Iterable
@@ -437,7 +437,7 @@ merge(iter: Any): Iterable
 
 An alias for `zip`.
 
-#### Iterable#min()
+#### #min()
 
 ```js
 min(selector: Function): Number
@@ -461,7 +461,7 @@ let val = iter([
 //=> 2
 ```
 
-#### Iterable#orderBy()
+#### #orderBy()
 
 ```js
 orderBy(selector: Function, comparer: Function, descending: Boolean): OrderedIterable
@@ -509,7 +509,7 @@ let iterable = iter([
 //=> {a: 5, b: 6}, {a: 3, b: 4}, {a: 1, b: 2}
 ```
 
-#### Iterable#orderByDescending()
+#### #orderByDescending()
 
 ```js
 orderByDescending(selector: Function, comparer: Function): OrderedIterable
@@ -526,7 +526,7 @@ let iterable = iter([
 //=> {a: 5, b: 6}, {a: 3, b: 4}, {a: 1, b: 2}
 ```
 
-#### Iterable#reverse()
+#### #reverse()
 
 ```js
 reverse(): Iterable
@@ -539,7 +539,7 @@ let iterable = iter([1, 2, 3, 4, 5]).reverse();
 //=> 5, 4, 3, 2, 1
 ```
 
-#### Iterable#select()
+#### #select()
 
 ```js
 select(selector: Function): Iterable
@@ -556,7 +556,7 @@ let iterable = iter([
 //=> 1, 3, 5
 ```
 
-#### Iterable#skip()
+#### #skip()
 
 ```js
 skip(count: Number): Iterable
@@ -576,7 +576,7 @@ let iterable = iter([1, 2, 3, 4, 5]).skip(6);
 //=> (empty)
 ```
 
-#### Iterable#sum()
+#### #sum()
 
 ```js
 sum(selector: Function): Number
@@ -600,7 +600,7 @@ let val = iter([
 //=> 12
 ```
 
-#### Iterable#take()
+#### #take()
 
 ```js
 take(count: Number): Iterable
@@ -620,7 +620,7 @@ let iterable = iter([1, 2, 3, 4, 5]).take(6);
 //=> 1, 2, 3, 4, 5
 ```
 
-#### #Iterable#takeWhile()
+#### ##takeWhile()
 
 ```js
 takeWhile(predicate: Function): Iterable
@@ -628,7 +628,7 @@ takeWhile(predicate: Function): Iterable
 
 An alias for `while`.
 
-#### OrderedIterable#thenBy()
+#### Ordered#thenBy()
 
 ```js
 thenBy(selector: Function, comparer: Function, descending: Boolean): OrderedIterable
@@ -655,7 +655,7 @@ let iterable = iter([
 
 This method is only available on an `OrderedIterable`, and can make use of a custom comparer and descending flag in the same way as `orderBy()`.
 
-#### OrderedIterable#thenByDescending()
+#### Ordered#thenByDescending()
 
 ```js
 thenByDescending(selector: Function, comparer: Function): OrderedIterable
@@ -680,7 +680,7 @@ let iterable = iter([
      { id: 3, num: 22, num2: 33, num3: 77 } */
 ```
 
-#### Iterable#toArray()
+#### #toArray()
 
 ```js
 toArray(): Array
@@ -693,7 +693,7 @@ let arr = iter(function*() { yield 1; yield 2; yield 3; }).toArray();
 //=> [ 1, 2, 3 ]
 ```
 
-#### Iterable#union()
+#### #union()
 
 ```js
 union(...args): Iterable
@@ -701,7 +701,7 @@ union(...args): Iterable
 
 An alias for `concat`.
 
-#### Iterable#where()
+#### #where()
 
 ```js
 where(predicate: Function): Iterable
@@ -714,7 +714,7 @@ let iterable = iter([1, 2, 3, 4, 5]).where(x => x % 2 === 0);
 //=> 2, 4
 ```
 
-#### Iterable#while()
+#### #while()
 
 ```js
 while(predicate: Function): Iterable
@@ -727,7 +727,7 @@ let iterable = iter([1, 2, 3, 4, 5]).while(x => x < 4);
 //=> 1, 2, 3
 ```
 
-#### Iterable#zip()
+#### #zip()
 
 ```js
 zip(iter: Any, selector: Function): Iterable
@@ -740,7 +740,7 @@ let iterable = iter([1, 2, 3, 4, 5]).zip([1, 2, 3, 4, 5], (x, y) => x + y);
 //=> 2, 4, 6, 8, 10
 ```
 
-#### Iterable.empty()
+#### .empty()
 
 ```js
 Iterable.empty()
@@ -755,7 +755,7 @@ let iterable = Iterable.empty();
 
 An alias for `Iterable.iter()`.
 
-#### Iterable.iter()
+#### .iter()
 
 ```js
 iter(...args: any)
