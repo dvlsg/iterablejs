@@ -239,7 +239,7 @@ export default class Iterable {
     }
 
     intersect(
-          iter     : any
+          iter   : any
         , hasher : Function = x => x
     ): Iterable {
         let prev = this.data;
