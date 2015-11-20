@@ -228,6 +228,15 @@ export default class Iterable {
         return undefined;
     }
 
+    firstOrDefault(...args): any {
+        let def = args.pop();
+        let predicate = args.pop(); // fine if undefined. #first() will provide a default predicate.
+        let first = this.first(predicate);
+        if (first === undefined)
+            return def;
+        return first;
+    }
+
     flatten(): Iterable {
         let prev = this.data;
         this.data = _flatten(prev);
@@ -258,10 +267,10 @@ export default class Iterable {
     }
 
     last(
-        predicate : Function
+        predicate : Function = check.exists
     ): any {
         if (check.type(this.data, types.array)) {
-            if (check.instance(predicate, Function)) {
+            if (predicate instanceof Function) {
                 for (let i = this.data.length; i >= 0; i--) {
                     let v = this.data[i];
                     if (predicate(v))
@@ -269,7 +278,7 @@ export default class Iterable {
                 }
             }
             else
-                return this.data[this.data.length - 1];
+                return this.data[ this.data.length - 1 ];
         }
         else {
             // we could also take the easy way out and just convert
@@ -297,6 +306,15 @@ export default class Iterable {
             return result;
         }
         return undefined;
+    }
+
+    lastOrDefault(...args): any {
+        let def = args.pop();
+        let predicate = args.pop(); // fine if undefined. #last() will provide a default predicate.
+        let last = this.last(predicate);
+        if (last === undefined)
+            return def;
+        return last;
     }
 
     length(): Number {

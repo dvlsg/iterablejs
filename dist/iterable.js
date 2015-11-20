@@ -664,6 +664,19 @@ var Iterable = (function () {
             return undefined;
         }
     }, {
+        key: 'firstOrDefault',
+        value: function firstOrDefault() {
+            for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                args[_key2] = arguments[_key2];
+            }
+
+            var def = args.pop();
+            var predicate = args.pop(); // fine if undefined. #first() will provide a default predicate.
+            var first = this.first(predicate);
+            if (first === undefined) return def;
+            return first;
+        }
+    }, {
         key: 'flatten',
         value: function flatten() {
             var prev = this.data;
@@ -764,17 +777,19 @@ var Iterable = (function () {
     }, {
         key: 'join',
         value: function join() {
-            for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                args[_key2] = arguments[_key2];
+            for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+                args[_key3] = arguments[_key3];
             }
 
             return new (_bind.apply(MultiIterable, [null].concat([this], args)))();
         }
     }, {
         key: 'last',
-        value: function last(predicate) {
+        value: function last() {
+            var predicate = arguments[0] === undefined ? _zanaCheck2['default'].exists : arguments[0];
+
             if (_zanaCheck2['default'].type(this.data, _zanaUtil.types.array)) {
-                if (_zanaCheck2['default'].instance(predicate, Function)) {
+                if (predicate instanceof Function) {
                     for (var i = this.data.length; i >= 0; i--) {
                         var v = this.data[i];
                         if (predicate(v)) return v;
@@ -803,6 +818,19 @@ var Iterable = (function () {
                 return result;
             }
             return undefined;
+        }
+    }, {
+        key: 'lastOrDefault',
+        value: function lastOrDefault() {
+            for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+                args[_key4] = arguments[_key4];
+            }
+
+            var def = args.pop();
+            var predicate = args.pop(); // fine if undefined. #last() will provide a default predicate.
+            var last = this.last(predicate);
+            if (last === undefined) return def;
+            return last;
         }
     }, {
         key: 'length',
@@ -1402,8 +1430,8 @@ var Iterable = (function () {
     }, {
         key: 'iter',
         value: function iter() {
-            for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-                args[_key3] = arguments[_key3];
+            for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+                args[_key5] = arguments[_key5];
             }
 
             if (args.length === 1) return new Iterable(args[0]);else if (args.length > 1) return new (_bind.apply(MultiIterable, [null].concat(args)))();else return Iterable.empty();
@@ -1430,8 +1458,8 @@ var MultiIterable = (function (_Iterable) {
 
         _get(Object.getPrototypeOf(MultiIterable.prototype), 'constructor', this).call(this);
 
-        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-            args[_key4] = arguments[_key4];
+        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+            args[_key6] = arguments[_key6];
         }
 
         this.iterables = [].concat(args);
@@ -1588,8 +1616,8 @@ var MultiIterable = (function (_Iterable) {
     _createClass(MultiIterable, [{
         key: 'join',
         value: function join() {
-            for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-                args[_key5] = arguments[_key5];
+            for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+                args[_key7] = arguments[_key7];
             }
 
             return new (_bind.apply(MultiIterable, [null].concat(_toConsumableArray(this.iterables), args)))();
