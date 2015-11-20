@@ -56,47 +56,49 @@ let iterable = iter([1, 2, 3, 4, 5]);
 ### Links
 
 * Iterable
-    * [#aggregate](#aggregate)
-    * [#any](#any)
-    * [#at](#at)
-    * [#average](#average)
-    * [#concat](#concat)
-    * [#contains](#contains)
-    * [#distinct](#distinct)
-    * [#empty](#empty)
-    * [#every](#every)
-    * [#filter](#filter)
-    * [#first](#first)
-    * [#flatten](#flatten)
-    * [#full](#full)
-    * [#intersect](#intersect)
-    * [.iter](#iter)
-    * [#join](#join)
-    * [#last](#last)
-    * [#length](#length)
-    * [#map](#map)
-    * [#max](#max)
-    * [#merge](#merge)
-    * [#min](#min)
-    * [#orderBy](#orderby)
-    * [#orderByDescending](#orderbydescending)
-    * [#reduce](#reduce)
-    * [#reverse](#reverse)
-    * [#select](#select)
-    * [#skip](#skip)
-    * [#sum](#sum)
-    * [#take](#take)
-    * [#takeWhile](#takewhile)
-    * [#toArray](#toarray)
-    * [#union](#union)
-    * [#where](#where)
-    * [#while](#while)
-    * [#zip](#zip)
+    * [#aggregate()](#aggregate)
+    * [#any()](#any)
+    * [#at()](#at)
+    * [#average()](#average)
+    * [#concat()](#concat)
+    * [#contains()](#contains)
+    * [#distinct()](#distinct)
+    * [#empty()](#empty)
+    * [#every()](#every)
+    * [#filter()](#filter)
+    * [#first()](#first)
+    * [#firstOrDefault()](#firstOrDefault)
+    * [#flatten()](#flatten)
+    * [#full()](#full)
+    * [#intersect()](#intersect)
+    * [.iter()](#iter)
+    * [#join()](#join)
+    * [#last()](#last)
+    * [#lastOrDefault()](#lastOrDefault)
+    * [#length()](#length)
+    * [#map()](#map)
+    * [#max()](#max)
+    * [#merge()](#merge)
+    * [#min()](#min)
+    * [#orderBy()](#orderby)
+    * [#orderByDescending()](#orderbydescending)
+    * [#reduce()](#reduce)
+    * [#reverse()](#reverse)
+    * [#select()](#select)
+    * [#skip()](#skip)
+    * [#sum()](#sum)
+    * [#take()](#take)
+    * [#takeWhile()](#takewhile)
+    * [#toArray()](#toarray)
+    * [#union()](#union)
+    * [#where()](#where)
+    * [#while()](#while)
+    * [#zip()](#zip)
 * MultiIterable
-    * [#join](#join)
+    * [#join()](#join)
 * OrderedIterable
-    * [#thenBy](#thenby)
-    * [#thenByDescending](#thenbydescending)
+    * [#thenBy()](#thenby)
+    * [#thenByDescending()](#thenbydescending)
 
 ### Iterable
 
@@ -329,6 +331,28 @@ let val = iter([1, 2, 3, 4, 5]).first(x => x > 5);
 //=> undefined
 ```
 
+#### #firstOrDefault()
+
+```js
+firstOrDefault(default: Any): Any
+firstOrDefault(predicate: Function, default: Any): Any
+```
+
+Returns the first element yielded from the `Iterable`, or the default if no element is yielded.
+
+```js
+let val = iter([]).firstOrDefault(1);
+//=> 1
+```
+
+If a predicate is provided, then the first element yielded from the `Iterable` which passes the predicate will be returned.
+If no value passes the predicate, then the default will be returned.
+
+```js
+let val = iter([1, 2, 3, 4, 5]).firstOrDefault(x => x > 5, 6);
+//=> 6
+```
+
 #### #flatten()
 
 ```js
@@ -443,6 +467,28 @@ If the `Iterable` does not yield any elements or if no elements pass a given pre
 ```js
 let val = iter([1, 2, 3, 4, 5]).last(x => x > 5);
 //=> undefined
+```
+
+#### #lastOrDefault()
+
+```js
+lastOrDefault(default: Any): Any
+lastOrDefault(predicate: Function, default: Any): Any
+```
+
+Returns the last element yielded from the `Iterable`, or the default if no element is yielded.
+
+```js
+let val = iter([]).lastOrDefault(1);
+//=> 1
+```
+
+If a predicate is provided, then the last element yielded from the `Iterable` which passes the predicate will be returned.
+If no value passes the predicate, then the default will be returned.
+
+```js
+let val = iter([1, 2, 3, 4, 5]).lastOrDefault(x => x > 5, 6);
+//=> 6
 ```
 
 #### #length()
