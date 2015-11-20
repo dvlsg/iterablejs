@@ -9,8 +9,8 @@ export async function run() {
         log('Finding emails of users missing a password...');
         let emails = iter(users)
             .where(x => x.password == null || x.password === '')
-            .orderBy(x => new Date(x.created))
             .select(x => x.email)
+            .orderBy(x => x)
             .toArray();
         log(emails);
     }
