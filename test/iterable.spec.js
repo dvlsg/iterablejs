@@ -298,6 +298,35 @@ describe('Iterable', () => {
 
     });
 
+    describe('#firstOrDefault()', () => {
+
+        it('should return the first element of an iterable', () => {
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.firstOrDefault(), 1);
+        });
+
+        it('should return a provided default from an empty iterable', () => {
+            let iterable = iter([]);
+            assert.equal(iterable.firstOrDefault(1), 1);
+        });
+
+        it('should return a provided default from an iterable with null/undefined', () => {
+            let iterable = iter([undefined, null, undefined]);
+            assert.equal(iterable.firstOrDefault(1), 1);
+        });
+
+        it('should return the first element matching a given predicate', () => {
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.firstOrDefault(x => x > 2, 4), 3);
+        });
+
+        it('should return the default when no items match a given predicate', () => {
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.firstOrDefault(x => x > 5, 4), 4);
+        });
+
+    });
+
     describe('#flatten()', () => {
 
         it('should yield all non-iterable elements from a multi-tiered iterable', () => {
@@ -411,6 +440,35 @@ describe('Iterable', () => {
         it('should return undefined from an empty iterable', () => {
             let iterable = iter([]);
             assert.equal(iterable.last(), undefined);
+        });
+
+    });
+
+    describe('#lastOrDefault()', () => {
+
+        it('should return the last element of an iterable', () => {
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.lastOrDefault(), 3);
+        });
+
+        it('should return a provided default from empty iterables', () => {
+            let iterable = iter([]);
+            assert.equal(iterable.lastOrDefault(1), 1);
+        });
+
+        it('should return a provided default from an iterable with null/undefined', () => {
+            let iterable = iter([null, undefined, null]);
+            assert.equal(iterable.lastOrDefault(1), 1);
+        });
+
+        it('should return the last element matching a given predicate', () => {
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.lastOrDefault(x => x < 3, 4), 2);
+        });
+
+        it('should return the default when no items match a given predicate', () => {
+            let iterable = iter([1, 2, 3]);
+            assert.equal(iterable.lastOrDefault(x => x < 0, 4), 4);
         });
 
     });
