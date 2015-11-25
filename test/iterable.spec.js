@@ -80,7 +80,7 @@ describe('Iterable', () => {
             assert.equal(iterable.toArray(), [[1, 3], [1, 4], [2, 3], [2, 4]]);
         });
 
-        it('should be exposed an alias for the exported iter()', () => {
+        it('should be exposed as an alias for the exported iter()', () => {
             assert.equal(iter, Iterable.iter);
         });
 
@@ -804,6 +804,16 @@ describe('Iterable', () => {
             let iterable = new Iterable();
             assert.equal(iterable.union, iterable.concat);
         });
+
+    });
+
+    describe('#unique()', () => {
+
+        it('should be an alias for distinct()', () => {
+            let iterable = new Iterable();
+            assert.equal(iterable.unique, iterable.distinct);
+        });
+
     });
 
     describe('#where()', () => {
