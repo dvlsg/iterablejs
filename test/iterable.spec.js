@@ -1,6 +1,11 @@
 "use strict";
 
-import Iterable, { iter, OrderedIterable, MultiIterable } from '../src/iterable.js';
+import Iterable, {
+    iter,
+    GroupedIterable,
+    MultiIterable,
+    OrderedIterable
+} from '../src/iterable.js';
 import assert from 'zana-assert';
 
 describe('Iterable', () => {
@@ -351,6 +356,66 @@ describe('Iterable', () => {
             let undef;
             let iterable = iter([undefined, null, 1, undefined, undef]);
             assert.false(iterable.empty());
+        });
+
+    });
+
+    describe('#group()', () => {
+
+        const invoices = [
+            { product: 1, price: 20, qty: 5, customer: 3 },
+            { product: 1, price: 20, qty: 2, customer: 1 },
+            { product: 1, price: 20, qty: 8, customer: 1 },
+            { product: 2, price: 40, qty: 1, customer: 2 },
+            { product: 3, price: 60, qty: 3, customer: 3 }
+        ];
+
+        it('should yield GroupedIterables', () => {
+            let grouped = iter(invoices).group(x => x.product);
+            for (let group of grouped) {
+                assert.instance(group, Iterable);
+                assert.instance(group, GroupedIterable);
+                assert.is(group, GroupedIterable);
+            }
+        });
+
+        it('should group elements by key selector', () => {
+            let keySelector = x => x.product;
+            let grouped = iter(invoices).group(keySelector);
+            for (let group of grouped) {
+                let keys = group.select(keySelector).unique();
+                assert.equal(keys.length(), 1); // only one unique key per group.
+                let key = keys.first();
+                let filtered = invoices.filter(x => keySelector(x) === key); // eslint-disable-line no-loop-func
+                assert.equal(filtered.length, group.length()); // same number of objects as the source
+                for (let current of filtered)
+                    assert.true(group.contains(current)); // ensure that each filtered item exists in the group
+            }
+        });
+
+        it('should handle iterable work on the groups', () => {
+            let grouped = iter(invoices)
+                .group(invoice => invoice.product)
+                .select(group => ({
+                    product: group.key,
+                    priceSum: group.sum(invoice => invoice.price * invoice.qty),
+                    qtySum: group.sum(invoice => invoice.qty),
+                    distinctCustomerCount: group.unique(invoice => invoice.customer).length(),
+                    recordCount: group.length()
+                }))
+                .orderBy(processed => processed.product)
+                .toArray();
+            assert.equal(grouped[0], { product: 1, priceSum: 300, qtySum: 15, distinctCustomerCount: 2, recordCount: 3 });
+            assert.equal(grouped[1], { product: 2, priceSum: 40, qtySum: 1, distinctCustomerCount: 1, recordCount: 1 });
+            assert.equal(grouped[2], { product: 3, priceSum: 180, qtySum: 3, distinctCustomerCount: 1, recordCount: 1 });
+        });
+    });
+
+    describe('#groupBy()', () => {
+
+        it('should be an alias for group()', () => {
+            let iterable = iter([]);
+            assert.equal(iterable.group, iterable.groupBy);
         });
 
     });
@@ -988,6 +1053,31 @@ describe('Iterable', () => {
             assert.equal(iterable.toArray(), [1, 2, 3]);
             assert.equal(iterable.toArray(), []);
             assert.equal(iterable.toArray(), []);
+        });
+
+    });
+
+});
+
+describe('GroupedIterable', () => {
+
+    describe('constructor()', () => {
+
+        it('should accept a key and data', () => {
+            let iterable = new GroupedIterable('key', [ 1, 2, 3 ]);
+            assert.equal(iterable.key, 'key');
+            assert.equal([ ...iterable ], [ 1, 2, 3 ]);
+        });
+
+    });
+
+    describe('[toStringTag]', () => {
+
+        it('should return \'GroupedIterable\'', () => {
+            let iterable = new GroupedIterable();
+            assert.equal(iterable[Symbol.toStringTag], 'GroupedIterable');
+            assert.equal(Object.prototype.toString.call(iterable), '[object GroupedIterable]');
+            assert.equal(Object.prototype.toString.call(GroupedIterable.prototype), '[object GroupedIterable]');
         });
 
     });
