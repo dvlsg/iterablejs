@@ -70,6 +70,8 @@ let iterable = iter([1, 2, 3, 4, 5]);
     * [#firstOrDefault()](#firstordefault)
     * [#flatten()](#flatten)
     * [#full()](#full)
+    * [#group()](#group)
+    * [#groupBy()](#groupBy)
     * [#intersect()](#intersect)
     * [.iter()](#iter)
     * [#join()](#join)
@@ -381,6 +383,46 @@ let passed = iter([1, 2, 3, 4, 5]).full();
 let failed = iter([1, 2, 3, '', 5]).full();
 //=> false
 ```
+
+#### #group()
+
+```js
+group(keySelector: Function): Iterable
+```
+
+Returns an `Iterable` which yields the iterable grouping of elements based on the provided keySelector.
+
+```js
+let invoices = [
+    { product: 1, price: 20, qty: 5, customer: 3 },
+    { product: 1, price: 20, qty: 2, customer: 1 },
+    { product: 1, price: 20, qty: 8, customer: 1 },
+    { product: 2, price: 40, qty: 1, customer: 2 },
+    { product: 3, price: 60, qty: 3, customer: 3 }
+];
+
+let grouped = iter(invoices)
+    .group(invoice => invoice.product)
+    .select(group => ({
+        product: group.key,
+        priceSum: group.sum(invoice => invoice.price * invoice.qty),
+        qtySum: group.sum(invoice => invoice.qty),
+        distinctCustomerCount: group.unique(invoice => invoice.customer).length(),
+        recordCount: group.length()
+    }))
+    .orderBy(processed => processed.product);
+/*=> { product: 1, priceSum: 300, qtySum: 15, distinctCustomerCount: 2, recordCount: 3 },
+     { product: 2, priceSum: 40,  qtySum: 1,  distinctCustomerCount: 1, recordCount: 1 },
+     { product: 3, priceSum: 180, qtySum: 3,  distinctCustomerCount: 1, recordCount: 1 } */
+```
+
+#### #groupBy()
+
+```js
+groupBy(keySelector: Function): Iterable
+```
+
+An alias for [group](#group).
 
 #### #intersect()
 
