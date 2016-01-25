@@ -2,7 +2,7 @@
 
 /*
     @license
-    Copyright (C) 2015 Dave Lesage
+    Copyright (C) 2016 Dave Lesage
     License: MIT
     See license.txt for full license text.
 */
@@ -247,6 +247,25 @@ export default class Iterable {
         return !this.any(x => check.empty(x));
     }
 
+    group(
+        keySelector : Function = x => x
+    ): Iterable {
+        let prev = this.data;
+        return new Iterable(function*() {
+            let expanded = expand(prev);
+            let groups = new Map();
+            for (let element of expanded) {
+                let key = keySelector(element);
+                if (!groups.has(key))
+                    groups.set(key, []);
+                let group = groups.get(key);
+                group.push(element);
+            }
+            for (let [ key, arr ] of groups)
+                yield new GroupedIterable(key, arr);
+        });
+    }
+
     intersect(
           iter   : any
         , hasher : Function = x => x
@@ -480,12 +499,26 @@ export default class Iterable {
 Iterable.wrap = Iterable.iter;
 Iterable.from = Iterable.iter;
 Iterable.prototype.filter = Iterable.prototype.where;
+Iterable.prototype.groupBy = Iterable.prototype.group;
 Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.merge = Iterable.prototype.zip;
 Iterable.prototype.reduce = Iterable.prototype.aggregate;
 Iterable.prototype.takeWhile = Iterable.prototype.while;
 Iterable.prototype.union = Iterable.prototype.concat;
 Iterable.prototype.unique = Iterable.prototype.distinct;
+
+export class GroupedIterable extends Iterable {
+    key: any;
+
+    constructor(key, data) {
+        super(data);
+        this.key = key;
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'GroupedIterable';
+    }
+}
 
 export class MultiIterable extends Iterable {
 
