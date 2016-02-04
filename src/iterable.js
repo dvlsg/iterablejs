@@ -36,7 +36,7 @@ function compareKeys(comparer, keys, i1, i2) {
     return c;
 }
 
-function expand(iter: any) {
+function expand(iter) {
     if (iter && typeof iter === 'function') // could be mishandled. throw an error if iter() doesn't have [Symbol.iterator] defined?
         return iter();
     return iter;
@@ -98,8 +98,6 @@ function _flatten(item) {
 }
 
 export default class Iterable {
-    data: any;
-
     constructor(data) {
         this.data = data || [];
     }
@@ -126,9 +124,9 @@ export default class Iterable {
     }
 
     aggregate(
-          func: Function = (x) => x
-        , seed: any = null
-    ): any {
+          func = x => x
+        , seed = null
+    ) {
         let iter = this[Symbol.iterator]();
         let result = null;
         if (seed === null)
@@ -140,9 +138,7 @@ export default class Iterable {
         return result;
     }
 
-    any(
-        predicate : Function = check.exists
-    ): Boolean {
+    any(predicate = check.exists) {
         for (let v of this) {
             if (predicate(v))
                 return true;
@@ -150,7 +146,7 @@ export default class Iterable {
         return false;
     }
 
-    at(index: Number): any {
+    at(index) {
         if (check.instance(this.data, Array))
             return this.data[index];
         for (let v of this) {
@@ -159,16 +155,14 @@ export default class Iterable {
         }
     }
 
-    average(
-        selector : Function = x => x
-    ): Number {
+    average(selector = x => x) {
         let len = this.length();
         if (len === 0)
             return len;
         return this.sum(selector) / len;
     }
 
-    concat(...args): Iterable {
+    concat(...args) {
         let iters = [this.data];
         for (let arg of args) {
             if (arg instanceof Iterable) // a bit hacky... but functional. need to make sure we can use iter1.concat(iter1)
@@ -184,13 +178,11 @@ export default class Iterable {
         });
     }
 
-    contains(item: any): Boolean {
+    contains(item) {
         return this.any(x => util.equals(x, item));
     }
 
-    distinct(
-        hasher : Function = x => x
-    ): Iterable {
+    distinct(hasher = x => x) {
         let prev = this.data;
         return new Iterable(function*() {
             let seen = new Set();
@@ -204,13 +196,11 @@ export default class Iterable {
         });
     }
 
-    empty(): Boolean {
+    empty() {
         return !this.any(x => !check.empty(x));
     }
 
-    every(
-        predicate : Function = check.empty
-    ): Boolean {
+    every(predicate = check.empty) {
         for (let v of this) {
             if (!predicate(v))
                 return false;
@@ -218,9 +208,7 @@ export default class Iterable {
         return true;
     }
 
-    first(
-        predicate : Function = check.exists
-    ): any {
+    first(predicate = check.exists) {
         for (let v of this) {
             if (predicate(v))
                 return v;
@@ -228,7 +216,7 @@ export default class Iterable {
         return undefined;
     }
 
-    firstOrDefault(...args): any {
+    firstOrDefault(...args) {
         let def = args.pop();
         let predicate = args.pop(); // fine if undefined. #first() will provide a default predicate.
         let first = this.first(predicate);
@@ -237,19 +225,17 @@ export default class Iterable {
         return first;
     }
 
-    flatten(): Iterable {
+    flatten() {
         let prev = this.data;
         this.data = _flatten(prev);
         return this;
     }
 
-    full(): Boolean {
+    full() {
         return !this.any(x => check.empty(x));
     }
 
-    group(
-        keySelector : Function = x => x
-    ): Iterable {
+    group(keySelector = x => x) {
         let prev = this.data;
         return new Iterable(function*() {
             let expanded = expand(prev);
@@ -266,10 +252,7 @@ export default class Iterable {
         });
     }
 
-    intersect(
-          iter   : any
-        , hasher : Function = x => x
-    ): Iterable {
+    intersect(iter, hasher = x => x) {
         let prev = this.data;
         return new Iterable(function*() {
             let set = new Set(Iterable.from(iter).select(hasher).toArray());
@@ -281,13 +264,11 @@ export default class Iterable {
         });
     }
 
-    join(...args): MultiIterable {
+    join(...args) {
         return new MultiIterable(this, ...args);
     }
 
-    last(
-        predicate : Function = check.exists
-    ): any {
+    last(predicate = check.exists) {
         if (check.type(this.data, types.array)) {
             if (predicate instanceof Function) {
                 for (let i = this.data.length; i >= 0; i--) {
@@ -327,7 +308,7 @@ export default class Iterable {
         return undefined;
     }
 
-    lastOrDefault(...args): any {
+    lastOrDefault(...args) {
         let def = args.pop();
         let predicate = args.pop(); // fine if undefined. #last() will provide a default predicate.
         let last = this.last(predicate);
@@ -336,7 +317,7 @@ export default class Iterable {
         return last;
     }
 
-    length(): Number {
+    length() {
         // shortcut if we have length defined -- do we want to give sets/maps (`size`) the same treatment?
         if (this.data.length && check.type(this.data.length, types.number))
             return this.data.length;
@@ -347,9 +328,7 @@ export default class Iterable {
         return len;
     }
 
-    max(
-        selector : Function = x => x
-    ): Number {
+    max(selector = x => x) {
         let max;
         for (let v of this) {
             let num = selector(v);
@@ -359,9 +338,7 @@ export default class Iterable {
         return max;
     }
 
-    min(
-        selector : Function = x => x
-    ): Number {
+    min(selector = x => x) {
         let min;
         for (let v of this) {
             let num = selector(v);
@@ -372,23 +349,21 @@ export default class Iterable {
     }
 
     orderBy(
-          selector   : Function = (x)    => x
-        , comparer   : Function = (x, y) => x > y ? 1 : x < y ? -1 : 0
-        , descending : boolean  = false
-    ): OrderedIterable
-    {
+          selector   = (x)    => x
+        , comparer   = (x, y) => x > y ? 1 : x < y ? -1 : 0
+        , descending = false
+    ) {
         return new OrderedIterable(this, selector, comparer, descending);
     }
 
     orderByDescending(
-          selector : Function = (x)    => x
-        , comparer : Function = (x, y) => x > y ? 1 : x < y ? -1 : 0
-    ): OrderedIterable
-    {
+          selector = (x)    => x
+        , comparer = (x, y) => x > y ? 1 : x < y ? -1 : 0
+    ) {
         return new OrderedIterable(this, selector, comparer, true);
     }
 
-    reverse(): Iterable {
+    reverse() {
         let prev = this.data;
         return new Iterable(function*() {
             let expanded = expand(prev)[Symbol.iterator]();
@@ -396,7 +371,7 @@ export default class Iterable {
         });
     }
 
-    select(selector: Function = (x) => x): Iterable {
+    select(selector = x => x) {
         let prev = this.data;
         return new Iterable(function*() {
             for (let v of expand(prev))
@@ -404,7 +379,7 @@ export default class Iterable {
         });
     }
 
-    skip(count: Number = 1): Iterable {
+    skip(count = 1) {
         let prev = this.data;
         return new Iterable(function*() {
             let a,
@@ -420,9 +395,7 @@ export default class Iterable {
         });
     }
 
-    sum(
-        selector : Function = x => x
-    ): Number {
+    sum(selector = x => x) {
         let sum = 0;
         for (let v of this) {
             let num = selector(v);
@@ -432,7 +405,7 @@ export default class Iterable {
         return sum;
     }
 
-    take(count: Number = 1): Iterable {
+    take(count = 1) {
         let prev = this.data;
         return new Iterable(function*() {
             let i = 0;
@@ -444,7 +417,7 @@ export default class Iterable {
         });
     }
 
-    toArray(): Array<any> {
+    toArray() {
         //// option 1
         // return Array.from(this);
 
@@ -460,7 +433,7 @@ export default class Iterable {
         // return arr;
     }
 
-    where(predicate: Function = (x) => x): Iterable {
+    where(predicate = x => x) {
         let prev = this.data;
         return new Iterable(function*() {
             for (let v of expand(prev)) {
@@ -470,7 +443,7 @@ export default class Iterable {
         });
     }
 
-    while(predicate: Function = x => x): Iterable {
+    while(predicate = x => x) {
         let prev = this.data;
         return new Iterable(function*() {
             for (var v of expand(prev)) {
@@ -482,9 +455,9 @@ export default class Iterable {
     }
 
     zip(
-          iter     : any
-        , selector : Function = (x, y) => extend(x, y)
-    ): Iterable {
+          iter
+        , selector = (x, y) => extend(x, y)
+    ) {
         let prev = this.data;
         return new Iterable(function*() {
             let aIter = expand(prev)[Symbol.iterator]();
@@ -508,7 +481,6 @@ Iterable.prototype.union = Iterable.prototype.concat;
 Iterable.prototype.unique = Iterable.prototype.distinct;
 
 export class GroupedIterable extends Iterable {
-    key: any;
 
     constructor(key, data) {
         super(data);
@@ -521,8 +493,6 @@ export class GroupedIterable extends Iterable {
 }
 
 export class MultiIterable extends Iterable {
-
-    iterables: Array<Iterable>;
 
     constructor(...args) {
         super();
@@ -558,15 +528,11 @@ export class MultiIterable extends Iterable {
 
 export class OrderedIterable extends Iterable {
 
-    comparer   : Function;
-    selector   : Function;
-    descending : boolean;
-
     constructor(
-          data       : any
-        , selector   : Function = (x)    => x
-        , comparer   : Function = (x, y) => x > y ? 1 : x < y ? -1 : 0
-        , descending : boolean  = false
+          data
+        , selector   = (x)    => x
+        , comparer   = (x, y) => x > y ? 1 : x < y ? -1 : 0
+        , descending = false
     ) {
         super(data);
         this.selector = selector;
@@ -600,10 +566,10 @@ export class OrderedIterable extends Iterable {
     }
 
     thenBy(
-          newSelector : Function = (x)    => x
-        , newComparer : Function = (x, y) => (x > y ? 1 : x < y ? -1 : 0)
-        , descending  : Boolean  = false
-    ): OrderedIterable {
+          newSelector = (x)    => x
+        , newComparer = (x, y) => (x > y ? 1 : x < y ? -1 : 0)
+        , descending  = false
+    ) {
         // wrap the old selector in a new selector function
         // which will build all keys into a primary/secondary structure,
         // allowing the primary key selector to grow recursively
@@ -639,9 +605,9 @@ export class OrderedIterable extends Iterable {
     }
 
     thenByDescending(
-          newSelector: Function = (x)    => x
-        , newComparer: Function = (x, y) => (x > y ? 1 : x < y ? -1 : 0)
-    ): OrderedIterable {
+          newSelector = (x)    => x
+        , newComparer = (x, y) => (x > y ? 1 : x < y ? -1 : 0)
+    ) {
         return this.thenBy(newSelector, newComparer, true);
     }
 }
