@@ -158,7 +158,7 @@ export default class Iterable {
     average(selector = x => x) {
         let len = this.length();
         if (len === 0)
-            return len;
+            return NaN;
         return this.sum(selector) / len;
     }
 
