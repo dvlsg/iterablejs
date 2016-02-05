@@ -196,6 +196,13 @@ let val = iter([
 //=> 3
 ```
 
+If the `Iterable` is empty, then NaN will be returned.
+
+```js
+let val = iter([]).average();
+//=> NaN
+```
+
 #### #concat()
 
 ```js
