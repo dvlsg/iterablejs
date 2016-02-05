@@ -177,9 +177,9 @@ describe('Iterable', () => {
             assert.equal(iterable.average(), ((1 + 2 + 0 + 0 + 4) / 5));
         });
 
-        it('should return 0 from an empty iterable', () => {
+        it('should return NaN from an empty iterable', () => {
             let iterable = new Iterable();
-            assert.equal(iterable.average(), 0);
+            assert.equal(iterable.average(), NaN);
         });
 
         it('should use a custom selector', () => {
