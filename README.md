@@ -71,7 +71,7 @@ let iterable = iter([1, 2, 3, 4, 5]);
     * [#flatten()](#flatten)
     * [#full()](#full)
     * [#group()](#group)
-    * [#groupBy()](#groupBy)
+    * [#groupBy()](#groupby)
     * [#intersect()](#intersect)
     * [.iter()](#iter)
     * [#join()](#join)
