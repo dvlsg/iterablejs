@@ -204,7 +204,7 @@ class Iterable {
     }
 
     every() {
-        let predicate = arguments.length <= 0 || arguments[0] === undefined ? _zanaCheck2.default.empty : arguments[0];
+        let predicate = arguments.length <= 0 || arguments[0] === undefined ? _zanaCheck2.default.exists : arguments[0];
 
         for (let v of this) {
             if (!predicate(v)) return false;
@@ -453,8 +453,31 @@ class Iterable {
         // return arr;
     }
 
+    union() {
+        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+            args[_key6] = arguments[_key6];
+        }
+
+        let hasCallback = args[args.length - 1] instanceof Function;
+        let hasher = hasCallback ? args.pop() : undefined;
+        return new Iterable(this.data).concat(...args).distinct(hasher);
+    }
+
+    unwind() {
+        let selector = arguments.length <= 0 || arguments[0] === undefined ? x => x : arguments[0];
+
+        let prev = this.data;
+        return new Iterable(function* () {
+            for (let v of expand(prev)) {
+                let unwinding = new Iterable(selector(v));
+                let multi = new MultiIterable([v], unwinding);
+                yield* multi;
+            }
+        });
+    }
+
     where() {
-        let predicate = arguments.length <= 0 || arguments[0] === undefined ? x => x : arguments[0];
+        let predicate = arguments.length <= 0 || arguments[0] === undefined ? _zanaCheck2.default.exists : arguments[0];
 
         let prev = this.data;
         return new Iterable(function* () {
@@ -465,7 +488,7 @@ class Iterable {
     }
 
     while() {
-        let predicate = arguments.length <= 0 || arguments[0] === undefined ? x => x : arguments[0];
+        let predicate = arguments.length <= 0 || arguments[0] === undefined ? _zanaCheck2.default.exists : arguments[0];
 
         let prev = this.data;
         return new Iterable(function* () {
@@ -498,7 +521,7 @@ Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.merge = Iterable.prototype.zip;
 Iterable.prototype.reduce = Iterable.prototype.aggregate;
 Iterable.prototype.takeWhile = Iterable.prototype.while;
-Iterable.prototype.union = Iterable.prototype.concat;
+Iterable.prototype.unionAll = Iterable.prototype.concat;
 Iterable.prototype.unique = Iterable.prototype.distinct;
 
 class GroupedIterable extends Iterable {
@@ -519,8 +542,8 @@ class MultiIterable extends Iterable {
     constructor() {
         super();
 
-        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-            args[_key6] = arguments[_key6];
+        for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+            args[_key7] = arguments[_key7];
         }
 
         this.iterables = [...args];
@@ -546,8 +569,8 @@ class MultiIterable extends Iterable {
     }
 
     join() {
-        for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-            args[_key7] = arguments[_key7];
+        for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+            args[_key8] = arguments[_key8];
         }
 
         return new MultiIterable(...this.iterables, ...args);
@@ -580,7 +603,6 @@ class OrderedIterable extends Iterable {
             let sortedKeys = buildKeyArray(sortableElements, self.selector, sortedCount);
             let sortedMap = buildMapArray(sortedCount);
 
-            // todo: something with descending.
             quicksort(sortedKeys, sortedMap, self.comparer, 0, sortedCount - 1);
             for (let i = 0; i < sortedCount; i++) yield sortableElements[sortedMap[i]];
             for (let i = 0; i < unsortedCount; i++) yield unsortedElements[i];
