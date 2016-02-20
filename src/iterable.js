@@ -433,6 +433,17 @@ export default class Iterable {
         // return arr;
     }
 
+    unwind(selector = x => x) {
+        let prev = this.data;
+        return new Iterable(function*() {
+            for (let v of expand(prev)) {
+                let unwinding = new Iterable(selector(v));
+                let multi = new MultiIterable([ v ], unwinding);
+                yield* multi;
+            }
+        });
+    }
+
     where(predicate = check.exists) {
         let prev = this.data;
         return new Iterable(function*() {
