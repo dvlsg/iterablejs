@@ -433,6 +433,14 @@ export default class Iterable {
         // return arr;
     }
 
+    union(...args) {
+        let hasCallback = args[args.length - 1] instanceof Function;
+        let hasher = hasCallback ? args.pop() : undefined;
+        return new Iterable(this.data)
+            .concat(...args)
+            .distinct(hasher);
+    }
+
     unwind(selector = x => x) {
         let prev = this.data;
         return new Iterable(function*() {
@@ -488,7 +496,6 @@ Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.merge = Iterable.prototype.zip;
 Iterable.prototype.reduce = Iterable.prototype.aggregate;
 Iterable.prototype.takeWhile = Iterable.prototype.while;
-Iterable.prototype.union = Iterable.prototype.concat;
 Iterable.prototype.unique = Iterable.prototype.distinct;
 
 export class GroupedIterable extends Iterable {
@@ -563,7 +570,6 @@ export class OrderedIterable extends Iterable {
             let sortedKeys = buildKeyArray(sortableElements, self.selector, sortedCount);
             let sortedMap = buildMapArray(sortedCount);
 
-            // todo: something with descending.
             quicksort(sortedKeys, sortedMap, self.comparer, 0, sortedCount - 1);
             for (let i = 0; i < sortedCount; i++)
                 yield sortableElements[sortedMap[i]];
