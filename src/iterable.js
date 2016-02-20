@@ -496,6 +496,7 @@ Iterable.prototype.map = Iterable.prototype.select;
 Iterable.prototype.merge = Iterable.prototype.zip;
 Iterable.prototype.reduce = Iterable.prototype.aggregate;
 Iterable.prototype.takeWhile = Iterable.prototype.while;
+Iterable.prototype.unionAll = Iterable.prototype.concat;
 Iterable.prototype.unique = Iterable.prototype.distinct;
 
 export class GroupedIterable extends Iterable {
