@@ -93,6 +93,8 @@ let iterable = iter([1, 2, 3, 4, 5]);
     * [#takeWhile()](#takewhile)
     * [#toArray()](#toarray)
     * [#union()](#union)
+    * [#unionAll()](#unionall)
+    * [#unwind()](#unwind)
     * [#where()](#where)
     * [#while()](#while)
     * [#zip()](#zip)
@@ -107,22 +109,27 @@ let iterable = iter([1, 2, 3, 4, 5]);
 #### #aggregate()
 
 ```js
+aggregate(func: Function): Any
 aggregate(func: Function, seed: Any): Any
 ```
 
 Reduces an `Iterable` to a single value, using a callback and an optional seed value.
 
 ```js
+let val = iter([2, 3, 4, 5])
+    .aggregate((carry, current) => {
+        return carry + current;
+    }, 1);
+//=> 15
+```
+
+If no seed value is provided, then the first yielded element will be used as the seed.
+
+```js
 let val = iter([1, 2, 3, 4, 5])
     .aggregate((carry, current) => {
         return carry + current;
     });
-//=> 15
-
-let val2 = iter([2, 3, 4, 5])
-    .aggregate((carry, current) => {
-        return carry + current;
-    }, 1);
 //=> 15
 ```
 
@@ -142,7 +149,7 @@ let failed = iter([1, 2, 3, 4, 5]).any(x => x < 1);
 //=> false
 ```
 
-If no predicate is provided, then `any` will look for at least one value which is not `null` or `undefined`.
+If no predicate is provided, then a check for null and undefined will be used.
 
 ```js
 let passed = iter([null, undefined, 0]).any();
@@ -175,6 +182,7 @@ let val = iter([1, 2, 3, 4, 5]).at(6);
 #### #average()
 
 ```js
+average(): Number
 average(selector: Function): Number
 ```
 
@@ -246,6 +254,7 @@ let passed = iter([
 #### #distinct()
 
 ```js
+distinct(): Iterable
 distinct(hasher: Function): Iterable
 ```
 
@@ -281,17 +290,20 @@ let passed = iter([
     false,
     0,
     '',
-    []
+    [],
+    new Set(),
+    new Map()
 ]).empty();
 //=> true
 
-let failed = iter([0, null, undefined, 4, '']).empty();
+let failed = iter([0, null, undefined, 4, '', new Set(), new Map()]).empty();
 //=> false
 ```
 
 #### #every()
 
 ```js
+every(): Boolean
 every(predicate: Function): Boolean
 ```
 
@@ -305,9 +317,17 @@ let failed = iter([1, 2, '3', 4, 5]).every(x => typeof x === 'number');
 //=> false
 ```
 
+If no predicate is provided, then a check for null and undefined will be used.
+
+```js
+let failed = iter([1, 2, 3, null, 5]).every();
+//=> false
+```
+
 #### #filter()
 
 ```js
+filter(): Iterable
 filter(predicate: Function): Iterable
 ```
 
@@ -316,14 +336,20 @@ An alias for [where](#where).
 #### #first()
 
 ```js
+first(): Any
 first(predicate: Function): Any
 ```
 
-Returns the first element yielded from the `Iterable`.
+Returns the first non-null, non-undefined element yielded from the `Iterable`.
 
 ```js
 let val = iter([1, 2, 3, 4, 5]).first();
 //=> 1
+```
+
+```js
+let val = iter([null, 2, 3, 4, 5]).first();
+//=> 2
 ```
 
 If a predicate is provided, then the first element yielded from the `Iterable` which passes the predicate will be returned.
@@ -434,6 +460,7 @@ An alias for [group](#group).
 #### #intersect()
 
 ```js
+intersect(iter: Any): Iterable
 intersect(iter: Any, selector: Function): Iterable
 ```
 
@@ -494,6 +521,7 @@ iterable = iterable.join([5, 6]);
 #### #last()
 
 ```js
+last(): Any
 last(predicate: Function): Any
 ```
 
@@ -533,6 +561,12 @@ let val = iter([]).lastOrDefault(1);
 ```
 
 If a predicate is provided, then the last element yielded from the `Iterable` which passes the predicate will be returned.
+
+```js
+let val = iter([1, 2, 3, 4, 5]).lastOrDefault(x => x < 3, 6);
+//=> 2
+```
+
 If no value passes the predicate, then the default will be returned.
 
 ```js
@@ -566,6 +600,7 @@ An alias for [select](#select).
 #### #max()
 
 ```js
+max(): Number
 max(selector: Function): Number
 ```
 
@@ -598,6 +633,7 @@ An alias for [zip](#zip).
 #### #min()
 
 ```js
+min(): Number
 min(selector: Function): Number
 ```
 
@@ -622,6 +658,8 @@ let val = iter([
 #### #orderBy()
 
 ```js
+orderBy(selector: Function): OrderedIterable
+orderBy(selector: Function, comparer: Function): OrderedIterable
 orderBy(selector: Function, comparer: Function, descending: Boolean): OrderedIterable
 ```
 
@@ -670,6 +708,7 @@ let iterable = iter([
 #### #orderByDescending()
 
 ```js
+orderByDescending(selector: Function): OrderedIterable
 orderByDescending(selector: Function, comparer: Function): OrderedIterable
 ```
 
@@ -687,6 +726,7 @@ let iterable = iter([
 #### #reduce()
 
 ```js
+reduce(func: Function): Any
 reduce(func: Function, seed: Any): Any
 ```
 
@@ -725,6 +765,7 @@ let iterable = iter([
 #### #skip()
 
 ```js
+skip(): Iterable
 skip(count: Number): Iterable
 ```
 
@@ -742,9 +783,17 @@ let iterable = iter([1, 2, 3, 4, 5]).skip(6);
 //=> (empty)
 ```
 
+If no number is provided, then the next element will not be yielded from the `Iterable`.
+
+```js
+let iterable = iter([1, 2, 3, 4, 5]).skip();
+//=> 2, 3, 4, 5
+```
+
 #### #sum()
 
 ```js
+sum(): Number
 sum(selector: Function): Number
 ```
 
@@ -769,6 +818,7 @@ let val = iter([
 #### #take()
 
 ```js
+take(): Iterable
 take(count: Number): Iterable
 ```
 
@@ -786,9 +836,17 @@ let iterable = iter([1, 2, 3, 4, 5]).take(6);
 //=> 1, 2, 3, 4, 5
 ```
 
+If no number is provided, then only the next element will be yielded from the `Iterable`.
+
+```js
+let iterable = iter([1, 2, 3, 4, 5]).take();
+//=> 1
+```
+
 #### #takeWhile()
 
 ```js
+takeWhile(): Iterable
 takeWhile(predicate: Function): Iterable
 ```
 
@@ -811,13 +869,103 @@ let arr = iter(function*() { yield 1; yield 2; yield 3; }).toArray();
 
 ```js
 union(...args): Iterable
+union(...args, hasher: Function): Iterable
+```
+
+Returns an `Iterable` which yields a union of all given iterables.
+
+```js
+let iterable1 = iter([ 1, 2, 3 ]);
+let iterable2 = iter([ 3, 4, 5 ]);
+let union = iterable1.union(iterable2);
+//=> 1, 2, 3, 4, 5
+```
+
+If `hasher` callback is provided, then it will be used to determine uniqueness of the elements.
+
+```js
+let iterable1 = new Iterable([{ val: 1 }, { val: 2 }, { val: 3 }]);
+let iterable2 = new Iterable([{ val: 3 }, { val: 4 }, { val: 5 }]);
+let union = iterable1.union(iterable2, x => x.val);
+/*=> { val: 1 },
+     { val: 2 },
+     { val: 3 },
+     { val: 4 },
+     { val: 5 } */
+```
+
+***Important:*** *Due to the dynamic nature of the arguments, avoid passing an iterable `Function` or `GeneratorFunction` as the final argument to `#union()`.*
+
+*If you intend to use `Function` or `GeneratorFunction` as an iterable argument for `#union()`, consider either using `#concat()` followed by `#distinct()` instead, or wrapping each argument as an `Iterable` first.*
+
+#### #unionAll()
+
+```js
+unionAll(...args): Iterable
 ```
 
 An alias for [concat](#concat).
 
+#### #unwind()
+
+```js
+unwind(selector: Function): Iterable
+```
+
+Uses the `selector` provided to pluck a sub-iterable out of a sequence of iterables, iterating over the selected piece and yielding a pair of the base and sub element for *each* of the sub elements.
+
+```js
+let iterable = new Iterable([
+    { id: 1, arr: [ 'a', 'b' ] },
+    { id: 2, arr: [ 'c', 'd' ] },
+    { id: 3, arr: [ 'e', 'f' ] },
+    { id: 4, arr: [ 'g', 'h' ] },
+    { id: 5, arr: [ 'i', 'j' ] }
+])
+.unwind(x => x.arr);
+/*=> [ { id: 1, arr: [ 'a', 'b' ] }, 'a' ],
+     [ { id: 1, arr: [ 'a', 'b' ] }, 'b' ],
+     [ { id: 2, arr: [ 'c', 'd' ] }, 'c' ],
+     [ { id: 2, arr: [ 'c', 'd' ] }, 'd' ],
+     [ { id: 3, arr: [ 'e', 'f' ] }, 'e' ],
+     [ { id: 3, arr: [ 'e', 'f' ] }, 'f' ],
+     [ { id: 4, arr: [ 'g', 'h' ] }, 'g' ],
+     [ { id: 4, arr: [ 'g', 'h' ] }, 'h' ],
+     [ { id: 5, arr: [ 'i', 'j' ] }, 'i' ],
+     [ { id: 5, arr: [ 'i', 'j' ] }, 'j' ] */
+```
+
+No mutation or mapping of the base element is assumed. Typically, this method would be used with a further aggregation like `select()` in order to map elements as in the following example:
+
+```js
+let iterable = new Iterable([
+    { id: 1, arr: [ 'a', 'b' ] },
+    { id: 2, arr: [ 'c', 'd' ] },
+    { id: 3, arr: [ 'e', 'f' ] },
+    { id: 4, arr: [ 'g', 'h' ] },
+    { id: 5, arr: [ 'i', 'j' ] }
+])
+.unwind(x => x.arr)
+.select(([base, sub]) => ({
+    id: base.id,
+    letter: sub
+}));
+/*=> { id: 1, letter: 'a' },
+     { id: 1, letter: 'b' },
+     { id: 2, letter: 'c' },
+     { id: 2, letter: 'd' },
+     { id: 3, letter: 'e' },
+     { id: 3, letter: 'f' },
+     { id: 4, letter: 'g' },
+     { id: 4, letter: 'h' },
+     { id: 5, letter: 'i' },
+     { id: 5, letter: 'j' } */
+```
+
 #### #where()
 
 ```js
+where(): Iterable
 where(predicate: Function): Iterable
 ```
 
@@ -828,9 +976,17 @@ let iterable = iter([1, 2, 3, 4, 5]).where(x => x % 2 === 0);
 //=> 2, 4
 ```
 
+If no predicate is provided, then null and undefined will not be yielded.
+
+```js
+let iterable = iter(['', 2, 0, 4, null]).where();
+//=> '', 2, 0, 4
+```
+
 #### #while()
 
 ```js
+while(): Iterable
 while(predicate: Function): Iterable
 ```
 
@@ -838,6 +994,13 @@ Returns an `Iterable` which yields elements until a predicate returns `false`.
 
 ```js
 let iterable = iter([1, 2, 3, 4, 5]).while(x => x < 4);
+//=> 1, 2, 3
+```
+
+If no predicate is provided, then a check for null and undefined will be used.
+
+```js
+let iterable = iter([1, 2, 3, null, 5]).while();
 //=> 1, 2, 3
 ```
 
@@ -902,6 +1065,8 @@ let iterable = Iterable.iter([1, 2], [3, 4]);
 #### #thenBy()
 
 ```js
+thenBy(selector: Function): OrderedIterable
+thenBy(selector: Function, comparer: Function): OrderedIterable
 thenBy(selector: Function, comparer: Function, descending: Boolean): OrderedIterable
 ```
 
@@ -929,6 +1094,7 @@ This method is only available on an `OrderedIterable`, and can make use of a cus
 #### #thenByDescending()
 
 ```js
+thenByDescending(selector: Function): OrderedIterable
 thenByDescending(selector: Function, comparer: Function): OrderedIterable
 ```
 
