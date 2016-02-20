@@ -200,7 +200,7 @@ export default class Iterable {
         return !this.any(x => !check.empty(x));
     }
 
-    every(predicate = check.empty) {
+    every(predicate = check.exists) {
         for (let v of this) {
             if (!predicate(v))
                 return false;
@@ -433,7 +433,7 @@ export default class Iterable {
         // return arr;
     }
 
-    where(predicate = x => x) {
+    where(predicate = check.exists) {
         let prev = this.data;
         return new Iterable(function*() {
             for (let v of expand(prev)) {
@@ -443,7 +443,7 @@ export default class Iterable {
         });
     }
 
-    while(predicate = x => x) {
+    while(predicate = check.exists) {
         let prev = this.data;
         return new Iterable(function*() {
             for (var v of expand(prev)) {
