@@ -111,7 +111,7 @@ describe('Iterable', () => {
             assert.equal(val, 15);
         });
 
-        it('should use a seed', () => {
+        it('should use an optional seed', () => {
             let iterable = iter([2, 3, 4, 5]);
             let val = iterable.aggregate((carry, current) => {
                 return carry + current;
@@ -182,7 +182,7 @@ describe('Iterable', () => {
             assert.equal(iterable.average(), NaN);
         });
 
-        it('should use a custom selector', () => {
+        it('should use a provided selector', () => {
             let iterable = iter([1, 2, 3, 4]);
             assert.equal(iterable.average(x => x * 2), ((1 * 2 + 2 * 2 + 3 * 2 + 4 * 2) / 4));
         });
@@ -261,16 +261,38 @@ describe('Iterable', () => {
 
     describe('#empty()', () => {
 
-        it('should return true if all iterated values are null or undefined', () => {
+        it('should return true if all iterated values are considered to be empty', () => {
             let undef;
-            let iterable = iter([undefined, null, null, undefined, undef]);
+            let iterable = iter([ undefined, null, 0, false, [], undef, '', {}, new Map(), new Set()]);
             assert.true(iterable.empty());
         });
 
-        it('should return false if any iterated value is not null or undefined', () => {
+        it('should return false if any iterated value is not considered to be empty', () => {
             let undef;
-            let iterable = iter([undefined, null, 1, undefined, undef]);
+            let iterable = iter([undefined, null, 0, false, [], undef, '', new Map(), new Set([1])]);
             assert.false(iterable.empty());
+        });
+
+    });
+
+    describe('#every()', () => {
+
+        it('should return true if all iterated values pass a given predicate', () => {
+            let iterable = iter([ 2, 4, 6, 8, 10 ]);
+            assert.true(iterable.every(x => x % 2 === 0));
+        });
+
+        it('should return false if any iterated values fail a given predicate', () => {
+            let iterable = iter([ 2, 4, 6, 7, 10 ]);
+            assert.false(iterable.every(x => x % 2 === 0));
+        });
+
+        it('should use a check for null and undefined as default predicate', () => {
+            let iterable = iter([ 2, 4, 6, 8, 10 ]);
+            assert.true(iterable.every());
+
+            let iterable2 = iter([ 2, 4, 6, 8, null ]);
+            assert.false(iterable2.every());
         });
 
     });
@@ -294,6 +316,11 @@ describe('Iterable', () => {
         it('should return the first element matching a given predicate', () => {
             let iterable = iter([1, 2, 3]);
             assert.equal(iterable.first(x => x > 2), 3);
+        });
+
+        it('should use a check for null and undefined as default predicate', () => {
+            let iterable = iter([null, 2, 3]);
+            assert.equal(iterable.first(), 2);
         });
 
         it('should return undefined from an empty iterable', () => {
@@ -330,6 +357,11 @@ describe('Iterable', () => {
             assert.equal(iterable.firstOrDefault(x => x > 5, 4), 4);
         });
 
+        it('should use a check for null and undefined as default predicate', () => {
+            let iterable = iter([null, 2, 3]);
+            assert.equal(iterable.firstOrDefault(1), 2);
+        });
+
     });
 
     describe('#flatten()', () => {
@@ -346,16 +378,14 @@ describe('Iterable', () => {
 
     describe('#full()', () => {
 
-        it('should return true if all iterated values are null or undefined', () => {
-            let undef;
-            let iterable = iter([undefined, null, null, undefined, undef]);
-            assert.true(iterable.empty());
+        it('should return true if all iterated values are considered to be non-empty', () => {
+            let iterable = iter([ 1, '2', [ 2 ], true, { prop: true }, new Set([1]), new Map([[1, 1]])]);
+            assert.true(iterable.full());
         });
 
-        it('should return false if any iterated value is not null or undefined', () => {
-            let undef;
-            let iterable = iter([undefined, null, 1, undefined, undef]);
-            assert.false(iterable.empty());
+        it('should return false if any iterated value is considered to be empty', () => {
+            let iterable = iter([ 1, '2', [ 2 ], true, { prop: true }, new Set([0]), new Map()]);
+            assert.false(iterable.full());
         });
 
     });
@@ -485,7 +515,6 @@ describe('Iterable', () => {
                 [2, 4, 5],
                 [2, 4, 6]
             ]);
-
         });
 
     });
@@ -505,6 +534,11 @@ describe('Iterable', () => {
         it('should return undefined from an empty iterable', () => {
             let iterable = iter([]);
             assert.equal(iterable.last(), undefined);
+        });
+
+        it('should use a check for null and undefined as default predicate', () => {
+            let iterable = iter([1, 2, null]);
+            assert.equal(iterable.last(), 2);
         });
 
     });
@@ -534,6 +568,11 @@ describe('Iterable', () => {
         it('should return the default when no items match a given predicate', () => {
             let iterable = iter([1, 2, 3]);
             assert.equal(iterable.lastOrDefault(x => x < 0, 4), 4);
+        });
+
+        it('should use a check for null and undefined as default predicate', () => {
+            let iterable = iter([1, 2, null]);
+            assert.equal(iterable.lastOrDefault(3), 2);
         });
 
     });
@@ -794,6 +833,11 @@ describe('Iterable', () => {
             assert.equal(iter2.toArray(), [1, 2, 3]);
         });
 
+        it('should use a default count of 1 when none is provided', () => {
+            let iterable = iter([1, 2, 3]).skip();
+            assert.equal(iterable.toArray(), [2, 3]);
+        });
+
     });
 
     describe('#sum()', () => {
@@ -840,6 +884,11 @@ describe('Iterable', () => {
             assert.equal(iter2.toArray(), []);
         });
 
+        it('should use a default count of 1 when none is provided', () => {
+            let iterable = iter([1, 2, 3, 4, 5]).take();
+            assert.equal(iterable.toArray(), [1]);
+        });
+
     });
 
     describe('#takeWhile()', () => {
@@ -865,9 +914,40 @@ describe('Iterable', () => {
 
     describe('#union()', () => {
 
+        it('should make a union of distinct items', () => {
+            let iterable1 = new Iterable([1, 2, 3]);
+            let iterable2 = new Iterable([3, 4, 5]);
+            assert.equal(iterable1.union(iterable2).toArray(), [1, 2, 3, 4, 5]);
+        });
+
+        it('should accept multiple iterable items', () => {
+            // CAREFUL. if we pass a generator function as the last argument, this bombs, because it is interpreted as the hasher.
+            // no reliable way to determine if a function is a generator or not, especially since functions can work as iterators.
+            // since this is really just a helper method for iterable.concat(...iters).distinct(hasher), that's probably fine.
+            // maybe just make a note of it in the docs.
+            let iterable1 = new Iterable([1, 2, 3]);
+            assert.equal(iterable1.union([3, 4, 5], [5, 6, 7]).toArray(), [1, 2, 3, 4, 5, 6, 7]);
+        });
+
+        it('should accept hasher function to determine uniqueness', () => {
+            let iterable1 = new Iterable([{ val: 1 }, { val: 2 }, { val: 3 }]);
+            let iterable2 = new Iterable([{ val: 3 }, { val: 4 }, { val: 5 }]);
+            assert.equal(iterable1.union(iterable2, x => x.val).toArray(), [
+                { val: 1 },
+                { val: 2 },
+                { val: 3 },
+                { val: 4 },
+                { val: 5 }
+            ]);
+        });
+
+    });
+
+    describe('#unionAll()', () => {
+
         it('should be an alias for concat()', () => {
             let iterable = new Iterable();
-            assert.equal(iterable.union, iterable.concat);
+            assert.equal(iterable.unionAll, iterable.concat);
         });
 
     });
@@ -881,11 +961,47 @@ describe('Iterable', () => {
 
     });
 
+    describe('#unwind()', () => {
+
+        it('should yield a pair of base elements and unwound iterable elements', () => {
+            let arr = [
+                { id: 1, num: 11, num2: 44, num3: 88, arr: [ { subnum: 1 }, { subnum: 2 } ] },
+                { id: 2, num: 22, num2: 44, num3: 66, arr: [ { subnum: 1 }, { subnum: 2 } ] },
+                { id: 3, num: 22, num2: 33, num3: 77, arr: [ { subnum: 1 }, { subnum: 2 } ] },
+                { id: 4, num: 11, num2: 33, num3: 99, arr: [ { subnum: 1 }, { subnum: 2 } ] },
+                { id: 5, num: 22, num2: 44, num3: 55, arr: [ { subnum: 1 }, { subnum: 2 } ] }
+            ];
+            let iterable = iter(arr)
+                .unwind(x => x.arr)
+                .select(([ base, unwound ]) => ({
+                    id: base.id,
+                    subnum: unwound.subnum
+                }));
+            assert.equal(iterable.toArray(), [
+                { id: 1, subnum: 1 },
+                { id: 1, subnum: 2 },
+                { id: 2, subnum: 1 },
+                { id: 2, subnum: 2 },
+                { id: 3, subnum: 1 },
+                { id: 3, subnum: 2 },
+                { id: 4, subnum: 1 },
+                { id: 4, subnum: 2 },
+                { id: 5, subnum: 1 },
+                { id: 5, subnum: 2 }
+            ]);
+        });
+    });
+
     describe('#where()', () => {
 
         it('should yield only elements passing a predicate', () => {
             let iterable = iter([1, 2, 3, 4, 5]).where(x => x % 2 === 0);
             assert.equal(iterable.toArray(), [2, 4]);
+        });
+
+        it('should use a check for null and undefined as a default predicate', () => {
+            let iterable = iter(['', 2, 0, undefined, 4, null]).where();
+            assert.equal(iterable.toArray(), ['', 2, 0, 4]);
         });
 
     });
@@ -895,6 +1011,11 @@ describe('Iterable', () => {
         it('should yield elements until a predicate fails', () => {
             let iterable = iter([1, 2, 3, 4, 5, -1, 6, 7, 8]).while(x => x > 0);
             assert.equal(iterable.toArray(), [1, 2, 3, 4, 5]);
+        });
+
+        it('should use a check for null and undefined as a default predicate', () => {
+            let iterable = iter([1, 2, 3, null, 5]).while();
+            assert.equal(iterable.toArray(), [1, 2, 3]);
         });
 
     });
