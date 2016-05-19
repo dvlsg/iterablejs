@@ -269,7 +269,7 @@ Note that `distinct` uses a `Set` to determine if elements are unique. If a hash
 
 ```js
 let iterable = iter([{a: 1}, {a: 1}]).distinct();
-//=> {a: 1}, {a, 1}
+//=> {a: 1}, {a: 1}
 
 let iterable = iter([{a: 1}, {a: 1}]).distinct(x => x.a);
 //=> {a: 1}
